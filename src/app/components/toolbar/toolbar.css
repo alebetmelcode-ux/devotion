@@ -1,0 +1,85 @@
+.toolbar {
+  background-color: #1F4788;
+  color: white;
+  padding: 0 24px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.toolbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.toolbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+  display: flex; /* Make it a flex container to align image and text */
+  align-items: center; /* Vertically align items */
+  gap: 2px; /* Space between image and text */
+}
+
+.logo-image {
+  height: 32px; /* Adjust as needed */
+  width: auto;
+}
+
+.toolbar-menu-desktop a {
+  margin-left: 24px;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.toolbar-menu-desktop a:hover,
+.toolbar-menu-desktop a.active-link {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.toolbar-menu-mobile-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.toolbar-menu-mobile {
+  display: none;
+  background-color: #1F4788;
+  padding-bottom: 16px;
+}
+
+.toolbar-menu-mobile a {
+  display: block;
+  padding: 12px 24px;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+}
+
+.toolbar-menu-mobile a.active-link {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .toolbar-menu-desktop {
+    display: none;
+  }
+
+  .toolbar-menu-mobile-btn {
+    display: block;
+  }
+
+  .toolbar-menu-mobile.open {
+    display: block;
+  }
+}

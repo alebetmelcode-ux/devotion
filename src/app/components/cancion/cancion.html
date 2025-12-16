@@ -1,0 +1,59 @@
+<div class="song-editor">
+      <h2>{{ songToEdit() ? 'Editar Canción' : 'Nueva Canción' }}</h2>
+      
+      <form [formGroup]="songForm" (ngSubmit)="saveSong()" class="form-grid">
+        
+        <div class="form-group form-group-span-2">
+          <label for="titulo">Título *</label>
+          <input id="titulo" type="text" formControlName="titulo" placeholder="Nombre de la canción">
+        </div>
+
+        <div class="form-group">
+          <label>Tono Original *</label>
+          <div class="key-selector-inline">
+            <button type="button" class="transpose-btn" (click)="transposeDown()">
+              <lucide-icon name="chevron-down"></lucide-icon>
+            </button>
+            <span class="current-key">{{ songForm.get('tono-original')?.value }}</span>
+            <button type="button" class="transpose-btn" (click)="transposeUp()">
+              <lucide-icon name="chevron-up"></lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="id-categoria">Categoría</label>
+          <select id="id-categoria" formControlName="id-categoria">
+            <option value="">Seleccionar...</option>
+            <option value="adoracion">Adoración</option>
+            <option value="alabanza">Alabanza</option>
+            <option value="comunion">Comunión</option>
+            <option value="despedida">Despedida</option>
+            <option value="especial">Especial</option>
+            <option value="misionero">Misionero</option>
+          </select>
+        </div>
+
+        <div class="form-group form-group-span-2">
+          <label for="lyrics">Letra con acordes *</label>
+          <div class="lyrics-editor-wrapper">
+            <div class="lyrics-backdrop" [innerHTML]="highlightedLyrics"></div>
+            <textarea id="lyrics"
+                      formControlName="lyricsWithChords"
+                      (scroll)="syncScroll($event)"
+                      rows="15" 
+                      placeholder="Escribe la letra y los acordes de la canción."
+                      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+          </div>
+          <small>Tip: Escribe una línea con los acordes y la siguiente línea con la letra correspondiente.</small>
+        </div>
+
+        <div class="form-actions form-group-span-2">
+          <button type="button" (click)="onCancel()" class="btn-secondary">Cancelar</button>
+          <button type="button" (click)="addToDevocional()" class="btn-secondary">Añadir a Devocional</button>
+          <button type="submit" [disabled]="!songForm.valid" class="btn-primary">
+            {{ songToEdit() ? 'Actualizar' : 'Guardar' }} Canción
+          </button>
+        </div>
+      </form>
+    </div>

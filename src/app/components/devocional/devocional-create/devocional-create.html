@@ -1,0 +1,13 @@
+<div class="devocional-create-container">
+  <h2>Nuevo Devocional</h2>
+  <form [formGroup]="devocionalForm" (ngSubmit)="saveDevocional()">
+    <div class="form-group">
+      <label for="titulo">Título *</label>
+      <input id="titulo" type="text" formControlName="titulo" placeholder="Nombre del devocional">
+    </div>
+    <div class="form-actions">
+      <button type="button" [routerLink]="['/devocionales']" class="btn-secondary">Cancelar</button>
+      <button type="submit" [disabled]="!devocionalForm.valid" class="btn-primary">Guardar</button>
+    </div>
+  </form>
+</div>
