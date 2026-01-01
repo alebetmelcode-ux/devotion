@@ -4,7 +4,6 @@ footer {
   padding: 20px 24px;
   text-align: center;
   border-top: 1px solid #eee;
-  margin-top: auto; /* Push footer to the bottom */
 }
 
 .footer-container {

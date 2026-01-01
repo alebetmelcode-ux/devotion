@@ -1,0 +1,187 @@
+<div class="card-container">
+  <p-drawer #drawerRef [(visible)]="visible">
+    <ng-template #headless>
+      <div class="drawer-content">
+        <div class="drawer-header">
+          <span class="logo-container">
+            <a routerLink="/" class="toolbar-logo"><img src="assets/images/devotion.png" alt="Devotion Logo" class="logo-image"> </a>
+
+           
+          </span>
+          <span>
+            <p-button 
+              type="button" 
+              (click)="closeCallback($event)" 
+              icon="pi pi-times" 
+              [rounded]="true" 
+              [outlined]="true" 
+              styleClass="close-button">
+            </p-button>
+          </span>
+        </div>
+        
+        <div class="drawer-body">
+          <ul class="menu-list">
+            <li>
+              <div
+                pRipple
+                pStyleClass="@next"
+                enterFromClass="hidden"
+                enterActiveClass="animate-slidedown"
+                leaveToClass="hidden"
+                leaveActiveClass="animate-slideup"
+                class="menu-section-header"
+              >
+                <span class="section-title">FAVORITES</span>
+                <i class="pi pi-chevron-down"></i>
+              </div>
+              <ul class="submenu-list">
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-home menu-icon"></i>
+                    <span class="menu-label">Dashboard</span>
+                  </a>
+                </li>
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-bookmark menu-icon"></i>
+                    <span class="menu-label">Bookmarks</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    pRipple
+                    pStyleClass="@next"
+                    enterFromClass="hidden"
+                    enterActiveClass="animate-slidedown"
+                    leaveToClass="hidden"
+                    leaveActiveClass="animate-slideup"
+                    class="menu-item"
+                  >
+                    <i class="pi pi-chart-line menu-icon"></i>
+                    <span class="menu-label">Reports</span>
+                    <i class="pi pi-chevron-down menu-chevron"></i>
+                  </a>
+                  <ul class="nested-submenu">
+                    <li>
+                      <a
+                        pRipple
+                        pStyleClass="@next"
+                        enterFromClass="hidden"
+                        enterActiveClass="animate-slidedown"
+                        leaveToClass="hidden"
+                        leaveActiveClass="animate-slideup"
+                        class="menu-item"
+                      >
+                        <i class="pi pi-chart-line menu-icon"></i>
+                        <span class="menu-label">Revenue</span>
+                        <i class="pi pi-chevron-down menu-chevron"></i>
+                      </a>
+                      <ul class="nested-submenu">
+                        <li>
+                          <a pRipple class="menu-item">
+                            <i class="pi pi-table menu-icon"></i>
+                            <span class="menu-label">View</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a pRipple class="menu-item">
+                            <i class="pi pi-search menu-icon"></i>
+                            <span class="menu-label">Search</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a pRipple class="menu-item">
+                        <i class="pi pi-chart-line menu-icon"></i>
+                        <span class="menu-label">Expenses</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-users menu-icon"></i>
+                    <span class="menu-label">Team</span>
+                  </a>
+                </li>
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-comments menu-icon"></i>
+                    <span class="menu-label">Messages</span>
+                    <span class="badge">3</span>
+                  </a>
+                </li>
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-calendar menu-icon"></i>
+                    <span class="menu-label">Calendar</span>
+                  </a>
+                </li>
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-cog menu-icon"></i>
+                    <span class="menu-label">Settings</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          
+          <ul class="menu-list">
+            <li>
+              <div
+                pRipple
+                pStyleClass="@next"
+                enterFromClass="hidden"
+                enterActiveClass="animate-slidedown"
+                leaveToClass="hidden"
+                leaveActiveClass="animate-slideup"
+                class="menu-section-header"
+              >
+                <span class="section-title">APPLICATION</span>
+                <i class="pi pi-chevron-down"></i>
+              </div>
+              <ul class="submenu-list">
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-folder menu-icon"></i>
+                    <span class="menu-label">Projects</span>
+                  </a>
+                </li>
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-chart-bar menu-icon"></i>
+                    <span class="menu-label">Performance</span>
+                  </a>
+                </li>
+                <li>
+                  <a pRipple class="menu-item">
+                    <i class="pi pi-cog menu-icon"></i>
+                    <span class="menu-label">Settings</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="drawer-footer">
+          <hr class="footer-divider" />
+          <a pRipple class="user-profile">
+     <p-avatar
+    image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+    pBadge
+    value="4"
+    severity="danger"
+    style="width: 40px;" />
+            <span class="user-name">Amy Elsner</span>
+          </a>
+        </div>
+      </div>
+    </ng-template>
+  </p-drawer>
+  
+  <p-button (click)="visible = true" icon="pi pi-bars"></p-button>
+</div>

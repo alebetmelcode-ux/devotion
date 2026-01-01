@@ -1,12 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ToolbarComponent } from './components/toolbar/toolbar';
 import { FooterComponent } from './components/footer/footer';
+
+import { ToolbarComponent } from './components/toolbar/toolbar';
+
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ToolbarComponent, FooterComponent],
+  imports: [RouterOutlet, FooterComponent,ToolbarComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
