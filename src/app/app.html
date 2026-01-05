@@ -1,5 +1,8 @@
-<app-toolbar></app-toolbar>
-<main>
-  <router-outlet></router-outlet>
-</main>
-<app-footer></app-footer>
+
+<h1> hola mundo</h1>
+
+ @for (usuario of usuarios; track usuario.id; let i = $index) {
+  <div>
+    {{ i }} - {{ usuario.username }}
+  </div>
+}
