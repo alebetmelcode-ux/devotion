@@ -1,0 +1,48 @@
+<div class="layout-wrapper">
+  <!-- Toolbar / Menubar -->
+  <p-drawer styleClass="layout-toolbar">
+    <ng-template pTemplate="start">
+      <button 
+        pButton 
+        icon="pi pi-bars" 
+        class="p-button-text p-button-plain menu-toggle-btn"
+        (click)="toggleSidebar()">
+      </button>
+      <span class="app-title">Doctor App</span>
+    </ng-template>
+    
+    <ng-template pTemplate="end">
+      <div class="user-section">
+        <label class="username-label">{{username}}</label>
+        <button 
+          pButton 
+          icon="pi pi-sign-out" 
+          class="p-button-text p-button-plain logout-btn"
+          (click)="cerrarSesion()"
+          pTooltip="Cerrar Sesión"
+          tooltipPosition="bottom">
+        </button>
+      </div>
+    </ng-template>
+  </p-drawer>
+
+  <!-- Layout Container -->
+  <div class="layout-container">
+    <!-- Sidebar -->
+    <p-drawer 
+      [(visible)]="sidebarVisible" 
+      [modal]="false"
+      [showCloseIcon]="false"
+      styleClass="layout-sidebar"
+      [baseZIndex]="1">
+    
+    </p-drawer>
+
+    <!-- Main Content -->
+    <div class="layout-content" [class.sidebar-open]="sidebarVisible">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>

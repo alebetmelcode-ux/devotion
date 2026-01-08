@@ -1,9 +1,10 @@
+<app-toolbar></app-toolbar>
 <div class="devocional-detail-container" *ngIf="devocional$ | async as devocional">
   <h2>{{ devocional.titulo }}</h2>
 
   <div class="song-list">
     <div *ngFor="let item of songs$ | async" class="song-item">
-      <h3>{{ item['posicion-cancion'] }}. {{ item.song?.titulo }}</h3>
+      <h3>{{ item['posicion-cancion'] }}. {{ item.song?.tituloCancion }}</h3>
       <p>Tono: {{ item['acordes-finales'] }}</p>
     </div>
   </div>

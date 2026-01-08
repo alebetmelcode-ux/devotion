@@ -1,0 +1,152 @@
+.login-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--surface-ground);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 450px; /* Ajustado para un layout de una columna */
+}
+
+.login-grid {
+    display: flex;
+    flex-direction: column; /* Apila el sidebar y el formulario */
+    gap: 0;
+    min-height: auto; /* Se ajustará al contenido */
+    border-radius: 12px;
+    overflow: hidden; /* Asegura que los bordes redondeados se vean bien */
+    background-color: var(--surface-card); /* Añade un fondo */
+    border: 1px solid rgba(95, 83, 83, 0.4); /* Añade un borde sutil */
+}
+
+.login-sidebar {
+    background: linear-gradient(to bottom right, var(--primary-500), var(--primary-700));
+    color: var(--primary-color-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    order: 1; /* Asegura que el sidebar esté arriba */
+}
+
+.sidebar-content {
+    text-align: center;
+    max-width: 300px;
+}
+
+.logo-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-divider {
+    border-color: rgba(255, 255, 255, 0.4);
+    margin: 1.5rem 0;
+}
+
+.sidebar-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.login-form-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    order: 2; /* Asegura que el formulario esté debajo */
+}
+
+.form-content {
+    width: 100%;
+    max-width: 400px;
+}
+
+.welcome-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.welcome-tag {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    width: 60%;
+}
+
+.form-fields .field {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+
+
+.full-width {
+    width: 100%;
+}
+
+.login-button {
+    margin-top: 1rem;
+}
+
+.login-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+/* Media Queries para responsividad */
+@media screen and (max-width: 992px) {
+    .login-sidebar {
+        padding: 1.5rem;
+        min-height: 200px; /* Reduce la altura del sidebar en pantallas pequeñas */
+    }
+
+    .login-form-container {
+        padding: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .login-section {
+        padding: 0.5rem;
+    }
+
+    .login-grid {
+        border-radius: 8px;
+    }
+
+    .login-sidebar {
+        padding: 1rem;
+        min-height: 150px;
+    }
+
+    .sidebar-text {
+        font-size: 0.95rem;
+    }
+
+    .login-form-container {
+        padding: 1rem;
+    }
+
+    .welcome-tag {
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .form-fields .field {
+        margin-bottom: 1rem;
+    }
+
+    
+}

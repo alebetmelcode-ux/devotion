@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { DevocionalService } from '../../../services/devocional.service';
+import { ToolbarComponent } from "../../toolbar/toolbar";
 
 @Component({
   selector: 'app-devocional-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ToolbarComponent],
   templateUrl: './devocional-create.html',
   styleUrls: ['./devocional-create.css']
 })

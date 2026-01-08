@@ -1,104 +1,90 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { UsuarioService } from '../services/usuario.service';
+import { CompartidoService } from '../services/compartido.service';
+import { Login } from '../../interfaces/login';
+import { CookieService } from 'ngx-cookie-service';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { ButtonModule } from 'primeng/button';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LoginService } from '../services/login.service';
-import { Router } from '@angular/router';
-import { CompartidoService } from '../services/compartido.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { ToastModule } from 'primeng/toast';
-import { RippleModule } from 'primeng/ripple';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { NgIf } from '@angular/common';
-import { ApiResponse } from '../../interfaces/ApiResponse';
-import { Sesion } from '../../interfaces/sesion';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { LoaderService } from '../services/loader.service';
 
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { DividerModule } from 'primeng/divider';
+import { TagModule } from 'primeng/tag';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    InputTextModule,PasswordModule,ButtonModule, ReactiveFormsModule,
-    ToastModule,RippleModule,ProgressSpinnerModule,FloatLabelModule
-  ],
+  CommonModule,
+    ReactiveFormsModule,
+    // PrimeNG
+    CardModule,FloatLabelModule,
+    InputTextModule,
+    PasswordModule,
+    ButtonModule,
+    DividerModule,
+    TagModule,
+    ProgressBarModule,InputGroupModule,InputGroupAddonModule
+   
+],
   templateUrl: './login.html',
   styleUrl: './login.css',
   encapsulation: ViewEncapsulation.None, // Desactiva la encapsulación
 })
 export class LoginComponent {
-  
-  // variable formulario reactivo
-  loginForm: FormGroup;
-
-  loading = false;  // Variable para manejar estado de carga
+  formLogin: FormGroup;
+  ocultarPassword: boolean = true;
+  mostrarLoading: boolean = false;
 
   constructor(
-     private fb: FormBuilder,
-     private loginService:LoginService,
-     private router: Router,
-     private compartidoService: CompartidoService,
-     private loaderService:LoaderService) {
-   
-   // Se inicializa el login 
-    this.loginForm = this.fb.group({
-      Usuario: ['', Validators.required],  // Usuario obligatorio
-      Contrasena: ['', [Validators.required,]] // Contraseña min 6 caracteres
+    private fb: FormBuilder,
+    private router: Router,
+    private usuarioServicio: UsuarioService,
+    private compartidoServicio: CompartidoService,
+    private cookieService: CookieService
+  ) {
+    this.formLogin = this.fb.group({
+      userName: ['', Validators.required],
+      password: ['', Validators.required],
     });
-    
   }
 
-  ngAfterViewInit() {
-    // Retraso para forzar la validación después de que el navegador haya autocompletado los campos
-    setTimeout(() => {
-      this.loginForm.updateValueAndValidity();
-      this.loginForm.markAllAsTouched();
-    }, 100);  // Ajusta el retraso si es necesario
-  }
-  
-  IniciarSesion() {
+  iniciarSesion() {
+    this.mostrarLoading = true;
+    const request: Login = {
+      userName: this.formLogin.value.userName,
+      password: this.formLogin.value.password,
+    };
+    this.usuarioServicio.iniciarSesion(request).subscribe({
+      next: (response) => {
+        this.compartidoServicio.guardarSesion(response);
 
-    //Valicion de formulario
-    if (this.loginForm.invalid) return;
+        this.cookieService.set(
+          'Authorization',
+          `Bearer ${response.token}`,
+          undefined,
+          '/',
+          undefined,
+          true,
+          'Strict'
+        );
 
-    //Activa spiner de espera 
-    this.loaderService.show();
-    
-    
-    //Inicia el servicio de login 
-    this.loginService.iniciarSession(this.loginForm.value).subscribe({
-      next: (response: ApiResponse<Sesion>) => {
-
-        // Se guarda objeto de session en local storage
-        this.compartidoService.guardarSesion(response.resultado);
-        
-        // Redirigir al inicio
-        this.router.navigate(['/Inicio']); 
-      },
-      error: (error: HttpErrorResponse) => {
-        
-        // Se oculta el spinner 
-       this.loaderService.hide();
-        let mensaje = 'Ocurrió un error inesperado.';
-        if (error.status === 401) {
-          mensaje = error.error?.mensaje || 'Usuario o contraseña incorrectos.';
-        } else if (error.status === 400) {
-          mensaje = error.error?.mensaje || 'Faltan datos en el formulario.';
-        }else if (error.status === 404) {
-          mensaje = error.error?.mensaje || 'Este Usuario no existe.';
-        } else if (error.status >= 500) {
-          mensaje = 'Error del servidor. Intenta más tarde.';
-        }
-        this.compartidoService.mostrarAlerta(mensaje, "error");
+        this.router.navigate(['cancion']);
       },
       complete: () => {
-
-        // se oculta el spiner 
-       this.loaderService.hide();
-      }
+        this.mostrarLoading = false;
+      },
+      error: (error) => {
+        this.compartidoServicio.mostrarAlerta(error.error, 'error');
+        this.mostrarLoading = false;
+      },
     });
   }
-
 }

@@ -14,7 +14,7 @@ export class LoginService {
  baseUrl:string = environment.apiUrl + "Login";
   constructor(private http: HttpClient) { }
 
-  iniciarSession(request: Login): Observable<ApiResponse<Sesion>> 
+  iniciarSesion(request: Login): Observable<ApiResponse<Sesion>> 
   {const url = `${this.baseUrl}/IniciarSesion`;
     return this.http.post<ApiResponse<Sesion>>(url, request);
   }

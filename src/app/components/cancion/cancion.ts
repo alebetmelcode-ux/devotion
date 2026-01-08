@@ -6,11 +6,12 @@ import { SongService } from '../../services/song.service';
 import { TransposeService } from '../../services/transpose.service';
 import { Song, ParsedLine } from '../../models/song.model';
 import { LucideAngularModule } from 'lucide-angular';
+import { ToolbarComponent } from "../toolbar/toolbar";
 
 @Component({
   selector: 'app-cancion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, ToolbarComponent],
   templateUrl: './cancion.html',
   styleUrl: './cancion.css',
 })
@@ -41,6 +42,9 @@ export class Cancion implements OnInit, AfterViewInit {
         this.resetForm();
       }
     });
+  }
+  populateForm(song: Song) {
+    throw new Error('Method not implemented.');
   }
 
   ngOnInit(): void {
@@ -132,40 +136,33 @@ export class Cancion implements OnInit, AfterViewInit {
   }
 
 
-  populateForm(song: Song): void {
-    this.songForm.patchValue({
-      id: song.id,
-      titulo: song.titulo,
-      'tono-original': song['tono-original'],
-      'id-categoria': song['id-categoria'] || '',
-      lyricsWithChords: this.combineLyricsAndChords(song.letra, song.acordes)
-    });
-  }
+ 
 
   saveSong(): void {
-    if (this.songForm.valid) {
-      const formValue = this.songForm.value;
-      const { letra, acordes } = this.splitLyricsAndChords(formValue.lyricsWithChords);
-      
-      const songToSave: Song = {
-        id: formValue.id || 0,
-        titulo: formValue.titulo,
-        'tono-original': formValue['tono-original'],
-        'id-categoria': formValue['id-categoria'],
-        letra: letra,
-        acordes: acordes
-      };
+  if (!this.songForm.valid) return;
 
-      if (songToSave.id) {
-        this.songService.updateSong(songToSave.id, songToSave);
-      } else {
-        this.songService.addSong(songToSave);
-      }
-      
+  const formValue = this.songForm.value;
+
+  // letra ya incluye los acordes
+  const letra = formValue.lyricsWithChords;
+
+  const songToSave: Song = {
+    id: formValue.id ?? 0,
+    tituloCancion: formValue.titulo,
+    tonoOriginal: formValue.tonoOriginal,
+    idCategoria: formValue.idCategoria,
+    letra
+  };
+
+  this.songService.addSong(songToSave).subscribe({
+    next: () => {
       this.songService.clearEditing();
       this.songSaved.emit();
-    }
-  }
+    },
+    error: err => console.error('Error API:', err)
+  });
+}
+
 
   onCancel(): void {
     this.songService.clearEditing();

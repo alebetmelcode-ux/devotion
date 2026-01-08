@@ -11,7 +11,7 @@ export class SongService {
 
   songToEdit = signal<Song | undefined>(undefined);
 
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = 'http://localhost:5138/api';
   private songApiUrl = `${this.apiUrl}/canciones`;
 
   private http = inject(HttpClient);
