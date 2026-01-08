@@ -5,11 +5,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { DevocionalService } from '../../../services/devocional.service';
 import { Devocional } from '../../../models/devocional.model';
 import { Observable } from 'rxjs';
+import { ToolbarComponent } from "../../toolbar/toolbar";
 
 @Component({
   selector: 'app-devocional-select-song',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, ToolbarComponent],
   templateUrl: './devocional-select-song.html',
   styleUrls: ['./devocional-select-song.css']
 })

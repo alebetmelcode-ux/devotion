@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { DevocionalService } from '../../../services/devocional.service';
 import { Devocional } from '../../../models/devocional.model';
 import { Observable } from 'rxjs';
+import { ToolbarComponent } from "../../toolbar/toolbar";
 
 @Component({
   selector: 'app-devocional-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ToolbarComponent],
   templateUrl: './devocional-list.html',
   styleUrls: ['./devocional-list.css']
 })

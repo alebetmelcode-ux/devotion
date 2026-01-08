@@ -1,10 +1,9 @@
 export interface Song {
   id: number;
-  titulo: string;
-  'tono-original': string
-  'id-categoria': string;
+  tituloCancion: string;
+  tonoOriginal: string;
+  idCategoria: number;
   letra: string;
-  acordes: string;
 }
 
 export type ParsedLine = {
