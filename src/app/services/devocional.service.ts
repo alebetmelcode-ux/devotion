@@ -45,19 +45,6 @@ export class DevocionalService {
     return this.http.post<DevocionalCancion>(`${this.devocionalApiUrl}/${devocionalCancion['id-devocional']}/add-song`, devocionalCancion);
   }
 
-  getFullSongsForDevocional(devocionalId: number): Observable<(DevocionalCancion & { song: Song | undefined })[]> {
-    return this.getSongsForDevocional(devocionalId).pipe(
-      switchMap(devocionalCanciones => {
-        if (devocionalCanciones.length === 0) {
-          return of([]);
-        }
-        const songObservables = devocionalCanciones.map(dc => 
-          this.songService.getSongById(dc['id-cancion']).pipe(
-            map(songDetails => ({ ...dc, song: songDetails }))
-          )
-        );
-        return forkJoin(songObservables);
-      })
-    );
+  
   }
-}
+
