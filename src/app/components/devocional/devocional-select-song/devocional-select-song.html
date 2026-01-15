@@ -26,7 +26,7 @@
     </div>
 
     <div class="form-actions form-group-span-2">
-      <button type="button" [routerLink]="['/cancion']" class="btn-secondary">Cancelar</button>
+      <button type="button" [routerLink]="['devocionales/seleccionar-cancion/:songId']" class="btn-secondary">Cancelar</button>
       <button type="submit" [disabled]="!selectForm.valid" class="btn-primary">Añadir Canción</button>
     </div>
   </form>

@@ -27,7 +27,7 @@ export class DevocionalDetailComponent implements OnInit {
     const devocionalId = Number(this.route.snapshot.paramMap.get('id'));
     if (devocionalId) {
       this.devocional$ = this.devocionalService.getDevocionalById(devocionalId);
-      this.songs$ = this.devocionalService.getFullSongsForDevocional(devocionalId);
+    
     }
   }
 }

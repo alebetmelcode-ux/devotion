@@ -1,275 +1,288 @@
-import { Component, signal, inject, effect, Output, EventEmitter, ElementRef, OnInit, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  effect,
+  ElementRef,
+  OnInit,
+  AfterViewInit,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { SongService } from '../../services/song.service';
 import { TransposeService } from '../../services/transpose.service';
-import { Song, ParsedLine } from '../../models/song.model';
+import { CategoriaService } from '../../services/categoria.service';
+
+import { Song } from '../../models/song.model';
+import { Categoria } from '../../../interfaces/categoria';
+
+import { ToolbarComponent } from '../toolbar/toolbar';
 import { LucideAngularModule } from 'lucide-angular';
-import { ToolbarComponent } from "../toolbar/toolbar";
+import { AutoCompleteModule } from 'primeng/autocomplete';
+
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import PPTXGenJS from 'pptxgenjs';
 
 @Component({
   selector: 'app-cancion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, ToolbarComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ToolbarComponent,
+    LucideAngularModule,
+    AutoCompleteModule
+  ],
   templateUrl: './cancion.html',
-  styleUrl: './cancion.css',
+  styleUrls: ['./cancion.css']
 })
 export class Cancion implements OnInit, AfterViewInit {
-  songService = inject(SongService);
-  transposeService = inject(TransposeService);
-  fb = inject(FormBuilder);
-  router = inject(Router);
 
-  songForm!: FormGroup;
-  
+  /* ===================== Servicios ===================== */
+  private songService = inject(SongService);
+  private transposeService = inject(TransposeService);
+  private categoriaService = inject(CategoriaService);
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+
+  constructor(private elRef: ElementRef) {}
+
+  /* ===================== Outputs ===================== */
   @Output() songSaved = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 
+  /* ===================== Estado ===================== */
+  songForm!: FormGroup;
+
+  categorias: Categoria[] = [];
+  categoriasCargando = true;
+
+  songs: Song[] = [];
+  cancionesCargando = true;
+
+  filteredSongs: Song[] = [];
+
   songToEdit = this.songService.songToEdit;
-  selectedChord = signal<string | null>(null); // Nueva señal para el acorde seleccionado
-  
 
   highlightedLyrics = '';
   private lyricsBackdrop: HTMLElement | null = null;
 
-  constructor(private elRef: ElementRef) {
-    effect(() => {
-      const song = this.songToEdit();
-      if (song) {
-        this.populateForm(song);
-      } else {
-        this.resetForm();
-      }
-    });
-  }
-  populateForm(song: Song) {
-    throw new Error('Method not implemented.');
-  }
-
+  /* ===================== INIT ===================== */
   ngOnInit(): void {
     this.songForm = this.fb.group({
       id: [null],
-      titulo: ['', Validators.required],
-      'tono-original': ['C', Validators.required],
-      'id-categoria': [''],
-      lyricsWithChords: ['', Validators.required]
+      tituloCancion: ['', Validators.required],
+      tonoOriginal: ['C', Validators.required],
+      idCategoria: [null, Validators.required],
+      idCancion: [null],
+      letra: ['', Validators.required]
     });
 
-    this.songForm.get('lyricsWithChords')?.valueChanges.subscribe(value => {
-      this.updateHighlight(value);
+    this.songForm.get('letra')!
+      .valueChanges
+      .subscribe(value => this.updateHighlight(value ?? ''));
+
+    this.loadCategorias();
+    this.loadSongs();
+
+    effect(() => {
+      const song = this.songToEdit();
+      song ? this.populateForm(song) : this.resetForm();
     });
   }
 
   ngAfterViewInit(): void {
-    // Attach event listener after view initialization
-    this.lyricsBackdrop = (this.elRef.nativeElement as HTMLElement).querySelector('.lyrics-backdrop');
-    if (this.lyricsBackdrop) {
-      this.lyricsBackdrop.addEventListener('click', this.handleChordClick.bind(this));
-    }
+    this.lyricsBackdrop =
+      this.elRef.nativeElement.querySelector('.lyrics-backdrop');
   }
 
-  private handleChordClick(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (target && target.classList.contains('chord-highlight')) {
-      const chord = target.getAttribute('data-chord');
-      if (chord) {
-        this.onChordClick(chord);
+  /* ===================== CARGA DATOS ===================== */
+  loadCategorias(): void {
+    this.categoriaService.getCategorias().subscribe({
+      next: res => {
+        this.categorias = res;
+        this.categoriasCargando = false;
+      },
+      error: err => {
+        console.error('Error categorías', err);
+        this.categoriasCargando = false;
       }
-    }
+    });
   }
 
-  updateHighlight(text: string): void {
-    if (typeof text !== 'string') {
-      this.highlightedLyrics = '';
-      return;
-    };
-    // This regex is a bit more specific to avoid matching random capital letters.
-    // It looks for a chord structure, potentially with slashes for bass notes.
-    const chordRegex = /(?<=\s|^|\(|\[)([A-G](?:b|#)?(?:m|maj|min|dim|aug|sus|add)?[0-9]*(?:\/[A-G](?:b|#)?)?)(?=\s|$|\)|\-|\])/g;
-    const highlighted = text
+  loadSongs(): void {
+    this.songService.getSongs().subscribe({
+      next: (res: any) => {
+        this.songs = res.resultado ?? res;
+        this.filteredSongs = [...this.songs];
+        this.cancionesCargando = false;
+      },
+      error: err => {
+        console.error('Error canciones', err);
+        this.cancionesCargando = false;
+      }
+    });
+  }
+
+  /* ===================== AUTOCOMPLETE ===================== */
+  filterSongs(event: any): void {
+    const query = (event.query ?? '').toLowerCase();
+
+    this.filteredSongs = this.songs.filter(song =>
+      song.tituloCancion.toLowerCase().includes(query) ||
+      song.letra?.toLowerCase().includes(query)
+    );
+  }
+
+  onSongSelected(event: any): void {
+    const song: Song = event.value;
+
+    this.songForm.patchValue({
+      tituloCancion: song.tituloCancion,
+      tonoOriginal: song.tonoOriginal,
+      idCategoria: song.idCategoria,
+      letra: song.letra,
+      idCancion: song.id
+    });
+
+    this.updateHighlight(song.letra);
+  }
+
+  /* ===================== FORM ===================== */
+  populateForm(song: Song): void {
+    this.songForm.patchValue({
+      id: song.id,
+      tituloCancion: song.tituloCancion,
+      tonoOriginal: song.tonoOriginal,
+      idCategoria: song.idCategoria,
+      letra: song.letra
+    });
+
+    this.songForm.get('idCancion')?.disable();
+    this.updateHighlight(song.letra);
+  }
+
+  resetForm(): void {
+    this.songForm.reset({
+      id: null,
+      tituloCancion: '',
+      tonoOriginal: 'C',
+      idCategoria: null,
+      idCancion: null,
+      letra: ''
+    });
+
+    this.songForm.get('idCancion')?.enable();
+    this.highlightedLyrics = '';
+  }
+
+  /* ===================== ACORDES ===================== */
+updateHighlight(text: string): void {
+  if (!text) {
+    this.highlightedLyrics = '';
+    return;
+  }
+
+  const chordRegex =
+    /\b([A-G](?:#|b)?(?:maj|min|m|sus|dim|aug|add)?\d*(?:\/[A-G](?:#|b)?)?)\b/g;
+
+  const titulo = this.songForm.get('tituloCancion')?.value ?? '';
+
+  this.highlightedLyrics =
+    `<h1 class="song-title">${titulo}</h1>` +
+    text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(chordRegex, `<span class="chord-highlight" data-chord="$1">$&</span>`) // Modified to use data-chord
-      .replace(/<br\/>$/, ''); // Remove the extra br if it exists at the end
-    this.highlightedLyrics = highlighted;
-  }
+      .replace(chordRegex, `<span class="chord-highlight">$1</span>`)
+      .replace(/\n/g, '<br>');
+}
 
-  onChordClick(chord: string): void {
-    this.selectedChord.set(chord);
-    console.log('Acorde seleccionado:', chord);
-  }
-
-  
   syncScroll(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-    if (!this.lyricsBackdrop) {
-      this.lyricsBackdrop = (this.elRef.nativeElement as HTMLElement).querySelector('.lyrics-backdrop');
-    }
     if (this.lyricsBackdrop) {
       this.lyricsBackdrop.scrollTop = textarea.scrollTop;
-      this.lyricsBackdrop.scrollLeft = textarea.scrollLeft;
     }
+  }
+
+  /* ===================== TRANSPOSICIÓN ===================== */
+  transposeUp(): void {
+    this.transpose(1);
   }
 
   transposeDown(): void {
-    const currentKey = this.songForm.get('tono-original')?.value || 'C';
-    const semitones = -1;
-    const lyrics = this.songForm.get('lyricsWithChords')?.value;
+    this.transpose(-1);
+  }
+
+  private transpose(semitones: number): void {
+    const key = (this.songForm.get('tonoOriginal')?.value ?? '').trim();
+    const letra = this.songForm.get('letra')?.value ?? '';
+
+    const newKey = this.transposeService.transposeChord(key, semitones);
+    const newLetra = this.transposeService.transposeText(letra, semitones);
 
     this.songForm.patchValue({
-      'lyricsWithChords': this.transposeService.transposeText(lyrics, semitones),
-      'tono-original': this.transposeService.transposeChord(currentKey, semitones)
+      tonoOriginal: newKey,
+      letra: newLetra
     });
   }
 
-  transposeUp(): void {
-    const currentKey = this.songForm.get('tono-original')?.value || 'C';
-    const semitones = 1;
-    const lyrics = this.songForm.get('lyricsWithChords')?.value;
-    
-    this.songForm.patchValue({
-      'lyricsWithChords': this.transposeService.transposeText(lyrics, semitones),
-      'tono-original': this.transposeService.transposeChord(currentKey, semitones)
-    });
-  }
-
-
- 
-
+  /* ===================== CRUD ===================== */
   saveSong(): void {
-  if (!this.songForm.valid) return;
+    if (this.songForm.invalid) return;
 
-  const formValue = this.songForm.value;
+    const { id, idCancion, ...songDto } = this.songForm.getRawValue();
 
-  // letra ya incluye los acordes
-  const letra = formValue.lyricsWithChords;
-
-  const songToSave: Song = {
-    id: formValue.id ?? 0,
-    tituloCancion: formValue.titulo,
-    tonoOriginal: formValue.tonoOriginal,
-    idCategoria: formValue.idCategoria,
-    letra
-  };
-
-  this.songService.addSong(songToSave).subscribe({
-    next: () => {
-      this.songService.clearEditing();
-      this.songSaved.emit();
-    },
-    error: err => console.error('Error API:', err)
-  });
-}
-
+    this.songService.addSong(songDto).subscribe({
+      next: res => {
+        alert(res.mensaje ?? 'Canción guardada correctamente ✅');
+        this.songService.clearEditing();
+        this.songSaved.emit();
+        this.loadSongs();
+      },
+      error: err =>
+        alert(err.error?.mensaje ?? 'Error al guardar canción ❌')
+    });
+  }
 
   onCancel(): void {
     this.songService.clearEditing();
     this.cancel.emit();
+    this.router.navigate(['/cancion']);
   }
 
-  addToDevocional(): void {
-    if (this.songForm.valid) {
-      const formValue = this.songForm.value;
-      const songId = formValue.id;
-      const { acordes } = this.splitLyricsAndChords(formValue.lyricsWithChords);
-
-      if (songId) {
-        this.router.navigate(['/devocionales/seleccionar-cancion', songId, { 'acordes-finales': acordes }]);
-      } else {
-        alert('Por favor, guarda la canción primero antes de añadirla a un devocional.');
-      }
-    } else {
-      alert('Por favor, completa el formulario de la canción correctamente.');
-    }
+  /* ===================== EXPORT ===================== */
+  exportPDF(): void {
+    const doc = new jsPDF();
+    doc.text(this.songForm.get('letra')!.value, 10, 10);
+    doc.save(`${this.songForm.get('tituloCancion')!.value}.pdf`);
   }
 
-  resetForm(): void {
-    if (this.songForm) {
-      this.songForm.reset({
-        id: null,
-        titulo: '',
-        'tono-original': 'C',
-        'id-categoria': '',
-        lyricsWithChords: ''
-      });
-    }
+  exportPPT(): void {
+    const pptx = new PPTXGenJS();
+    const slide = pptx.addSlide();
+    slide.addText(this.songForm.get('letra')!.value, { x: 0.5, y: 0.5 });
+    pptx.writeFile({ fileName: `${this.songForm.get('tituloCancion')!.value}.pptx` });
   }
 
-  splitLyricsAndChords(text: string): { letra: string; acordes: string } {
-    if (!text) return { letra: '', acordes: '' };
+  exportJPG(): void {
+    if (!this.lyricsBackdrop) return;
 
-    const lines = text.split('\n');
-    const lyricLines: string[] = [];
-    const chordLines: string[] = [];
-
-    // The original chord regex from the component, used for identification
-    const chordRegex = /(?<=\s|^|\(|\[)([A-G](?:b|#)?(?:m|maj|min|dim|aug|sus|add)?[0-9]*(?:\/[A-G](?:b|#)?)?)(?=\s|$|\)|\-|\])/g;
-
-    const isChordLine = (line: string) => {
-        const trimmed = line.trim();
-        if (!trimmed) return false;
-        // Permissive heuristic: if less than 20% of the line is non-chord, non-space characters, treat it as a chord line.
-        const nonChordChars = trimmed.replace(chordRegex, '').replace(/\s+/g, '');
-        return nonChordChars.length / trimmed.length < 0.2;
-    };
-
-    for (let i = 0; i < lines.length; i++) {
-        const currentLine = lines[i];
-        const nextLine = lines[i + 1];
-
-        if (isChordLine(currentLine)) {
-            chordLines.push(currentLine);
-            // If the next line is not a chord line (i.e., a lyric line), we associate the current chord line with it.
-            // If there's no next line or the next line is also a chord line, we associate it with an empty lyric line.
-            if (nextLine !== undefined && !isChordLine(nextLine)) {
-                lyricLines.push(nextLine);
-                i++; // Skip the next line as it's been consumed as a lyric line
-            } else {
-                lyricLines.push(''); // No lyric line directly associated, push an empty one for alignment
-            }
-        } else {
-            // If it's a lyric line, add it to lyricLines.
-            // If no corresponding chord line has been added yet for this lyric line index, add an empty one.
-            if (chordLines.length <= lyricLines.length) { // <= to account for initial state or consecutive lyric lines
-                chordLines.push('');
-            }
-            lyricLines.push(currentLine);
-        }
-    }
-    
-    // Ensure both arrays have the same length by padding the shorter one with empty strings
-    while (chordLines.length < lyricLines.length) {
-        chordLines.push('');
-    }
-    while (lyricLines.length < chordLines.length) {
-        lyricLines.push('');
-    }
-
-    // Filter out empty lines that were just for alignment if they appear at the end
-    // Or just join them directly and let the consumer handle empty lines.
-    return { letra: lyricLines.join('\n'), acordes: chordLines.join('\n') };
-  }
-
-  
-  combineLyricsAndChords(letra: string, acordes: string): string {
-    const lyricLines = letra.split('\n');
-    const chordLines = acordes.split('\n');
-    const combinedLines: string[] = [];
-    const maxLength = Math.max(lyricLines.length, chordLines.length);
-
-    for (let i = 0; i < maxLength; i++) {
-      const currentChordLine = chordLines[i] !== undefined ? chordLines[i] : '';
-      const currentLyricLine = lyricLines[i] !== undefined ? lyricLines[i] : '';
-
-      // Add chord line if it exists
-      if (currentChordLine.trim() !== '') {
-        combinedLines.push(currentChordLine);
-      }
-      // Always add lyric line (even if empty to maintain spacing)
-      combinedLines.push(currentLyricLine);
-    }
-    return combinedLines.join('\n');
+    html2canvas(this.lyricsBackdrop).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `${this.songForm.get('tituloCancion')!.value}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 1.0);
+      link.click();
+    });
   }
 }
