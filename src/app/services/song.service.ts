@@ -15,6 +15,9 @@ export class SongService {
 
   constructor() {}
 
+  getCanciones() {
+    return this.http.get<any>(this.apiUrl);
+  }
   /* -------------------- GET ALL -------------------- */
   getSongs(): Observable<Song[]> {
     return this.http.get<any>(this.apiUrl).pipe(
@@ -41,5 +44,8 @@ export class SongService {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
       map(res => res.resultado)
     );
+  }
+  crearMasivo(canciones: any[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/masivo`, canciones);
   }
 }

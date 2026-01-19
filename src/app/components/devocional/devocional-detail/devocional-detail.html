@@ -4,8 +4,8 @@
 
   <div class="song-list">
     <div *ngFor="let item of songs$ | async" class="song-item">
-      <h3>{{ item['posicion-cancion'] }}. {{ item.song?.tituloCancion }}</h3>
-      <p>Tono: {{ item['acordes-finales'] }}</p>
+      <h3>{{devocional.titulo }}. {{ item.song?.tituloCancion }}</h3>
+      <p>Tono: {{ devocional.id }}</p>
     </div>
   </div>
 

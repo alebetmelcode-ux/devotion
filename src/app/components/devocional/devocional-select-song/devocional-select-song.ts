@@ -30,7 +30,7 @@ export class DevocionalSelectSongComponent implements OnInit {
     this.songId = Number(this.route.snapshot.paramMap.get('songId'));
     this.finalChords = this.route.snapshot.paramMap.get('acordes-finales');
 
-    this.devocionales$ = this.devocionalService.getDevocionales();
+    this.devocionales$ = this.devocionalService.obtenerTodos();
 
     this.selectForm = this.fb.group({
       devocional: ['', Validators.required],

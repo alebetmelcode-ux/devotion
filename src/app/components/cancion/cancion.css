@@ -1,26 +1,12 @@
-:host {
-  display: block;
-  width: 100%;
-}
-
-/* ================= CONTENEDOR ================= */
 .song-editor {
-  max-width: 800px;
-  margin: 0 auto;
-  background: white;
+  max-width: 900px;
+  margin: auto;
   padding: 24px;
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-h2 {
-  margin-top: 0;
-  margin-bottom: 24px;
-  color: #1F4788;
-  text-align: center;
-}
-
-/* ================= FORM ================= */
+/* GRID BASE: 50 / 50 */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -36,204 +22,57 @@ h2 {
   grid-column: span 2;
 }
 
-label {
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
+/* CELDA DE CONTROLES */
+.controls-cell {
+  align-items: flex-start;
 }
 
-input,
-select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-family: inherit;
-  box-sizing: border-box;
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: #1F4788;
-  box-shadow: 0 0 0 3px rgba(31, 71, 136, 0.2);
-}
-
-/* ================= TONO ================= */
+/* TONO */
 .key-selector-inline {
   display: flex;
   align-items: center;
-  gap: 10px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  padding: 5px;
-  width: fit-content;
+  gap: 6px;
 }
 
 .current-key {
-  font-size: 1.1em;
   font-weight: bold;
   color: #1F4788;
-  min-width: 30px;
+  min-width: 32px;
   text-align: center;
 }
 
-.transpose-btn {
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
+/* MODO */
+.mode-toggle-inline {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
 }
 
-.transpose-btn:hover {
-  background: #e0e0e0;
+/* VISTA */
+.song-view {
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  line-height: 1.6;
 }
 
-/* ================= BOTONES ================= */
+.chord {
+  color: #1F4788;
+  font-weight: 600;
+}
+
+/* ACCIONES */
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  grid-column: span 2;
-}
-
-.btn-primary,
-.btn-secondary,
-.btn-contrast {
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  border: none;
-}
-
-.btn-primary {
-  background: #1F4788;
-  color: white;
-}
-
-.btn-secondary {
-  background: #E5E7EB;
-  color: #374151;
-  border: 1px solid #D1D5DB;
-}
-
-.btn-contrast {
-  background: #000;
-  color: white;
-}
-
-/* ================= EDITOR DE LETRA ================= */
-.lyrics-editor-wrapper {
-  position: relative;
-  font-family: 'Courier New', monospace;
-  font-size: 1rem;
-  line-height: 1.6;
-  height: 400px;              /* 🔥 AQUÍ está la clave */
-  overflow: hidden;
-}
-
-.lyrics-backdrop,
-textarea {
-  width: 100%;
-  height: 100%;
-  padding: 12px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  box-sizing: border-box;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.lyrics-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  background: #f9f9f9;
-  overflow-y: auto;
-}
-
-textarea {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  background: transparent;
-  color: transparent;
-  caret-color: #111;
-  resize: none;
-  overflow-y: auto;
-}
-
-/* ================= ACORDES ================= */
-:host ::ng-deep .chord-highlight {
-  color: #1F4788;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.chord-highlight:hover {
-  background: #cee0f4;
-}
-
-.chord-highlight.selected-chord {
-  background: #1F4788;
-  color: white;
-}
-
-/* ================= EXPORT ================= */
-.export-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-/* ================= MODO PRESENTACIÓN ================= */
-.lyrics-editor-wrapper.presentation {
-  height: 80vh;
-  background: black;
-  padding: 30px;
-  border-radius: 12px;
-}
-
-.lyrics-presentation {
-  color: white;
-  font-size: 1.7rem;
-  line-height: 1.8;
-  font-family: 'Courier New', monospace;
-  white-space: pre-wrap;
-  height: 100%;
-  overflow-y: auto;
-}
-
-:host ::ng-deep .presentation .chord-highlight {
-  color: #4FC3F7;
-  font-size: 1.8rem;
-}
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 640px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .span-2,
-  .form-actions {
-    grid-column: span 1;
-  }
-
-  .lyrics-editor-wrapper {
-    height: 300px;
-  }
 }

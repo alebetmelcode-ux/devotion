@@ -11,35 +11,46 @@ export class TransposeService {
   private static readonly NOTES_FLAT =
     ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-  // ✅ REGEX CORREGIDO
+  // ✅ SOLO ACORDES ENTRE [ ]
   private static readonly CHORDS_REGEX_GLOBAL =
-    /(?<=\s|^)([CDEFGAB](?:#|b)?(?:maj|min|m|sus|dim|aug|add)?[0-9]?(?:\/[CDEFGAB](?:#|b)?)?)(?=\s|$)/g;
-
-  transposeChord(chord: string, semitones: number): string {
-    const noteMatch = chord.match(/^([CDEFGAB](?:#|b)?)(.*)$/);
-    if (!noteMatch) return chord;
-
-    let baseNote = noteMatch[1];
-    const suffix = noteMatch[2];
-
-    baseNote = this.convertToSharp(baseNote);
-
-    const index = TransposeService.NOTES_SHARP.indexOf(baseNote);
-    if (index === -1) return chord;
-
-    const newIndex =
-      (index + semitones + 12) % 12;
-
-    return TransposeService.NOTES_SHARP[newIndex] + suffix;
-  }
+    /\[([^\]]+)\]/g;
 
   transposeText(text: string, semitones: number): string {
     if (!text) return '';
 
     return text.replace(
       TransposeService.CHORDS_REGEX_GLOBAL,
-      chord => this.transposeChord(chord, semitones)
+      (_, chord) => `[${this.transposeChord(chord, semitones)}]`
     );
+  }
+
+  transposeChord(chord: string, semitones: number): string {
+    const [main, bass] = chord.split('/');
+
+    const match = main.match(/^([CDEFGAB](?:#|b)?)(.*)$/);
+    if (!match) return chord;
+
+    let [, root, suffix] = match;
+    root = this.convertToSharp(root);
+
+    const index = TransposeService.NOTES_SHARP.indexOf(root);
+    if (index === -1) return chord;
+
+    const newRoot =
+      TransposeService.NOTES_SHARP[(index + semitones + 12) % 12];
+
+    let result = newRoot + suffix;
+
+    if (bass) {
+      const bassSharp = this.convertToSharp(bass);
+      const bassIndex = TransposeService.NOTES_SHARP.indexOf(bassSharp);
+      if (bassIndex !== -1) {
+        result += '/' +
+          TransposeService.NOTES_SHARP[(bassIndex + semitones + 12) % 12];
+      }
+    }
+
+    return result;
   }
 
   private convertToSharp(note: string): string {

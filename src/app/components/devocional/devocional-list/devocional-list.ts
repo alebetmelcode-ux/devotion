@@ -14,10 +14,13 @@ import { ToolbarComponent } from "../../toolbar/toolbar";
   styleUrls: ['./devocional-list.css']
 })
 export class DevocionalListComponent implements OnInit {
-  devocionalService = inject(DevocionalService);
-  devocionales$!: Observable<Devocional[]>;
+
+  devocionales: Devocional[] = [];
+
+  constructor(private devocionalService: DevocionalService) {}
 
   ngOnInit(): void {
-    this.devocionales$ = this.devocionalService.getDevocionales();
+    this.devocionalService.obtenerTodos()
+      .subscribe(data => this.devocionales = data);
   }
 }

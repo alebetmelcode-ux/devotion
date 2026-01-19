@@ -2,153 +2,130 @@
 
 <div class="song-editor">
 
-  <h2>
-    {{ songToEdit() ? 'Editar Canción' : 'Nueva Canción' }}
-  </h2>
+  <form [formGroup]="songForm" (ngSubmit)="saveSong()" class="form-grid">
 
-  <form
-    [formGroup]="songForm"
-    (ngSubmit)="saveSong()"
-    class="form-grid">
-
-    <!-- ================= TÍTULO ================= -->
-    <div class="form-group span-2">
-      <label for="tituloCancion">Título *</label>
+    <!-- FILA INICIAL -->
+    <!-- TÍTULO (50%) -->
+    <div class="form-group">
+      <label>Título *</label>
       <input
-        id="tituloCancion"
+        pInputText
         type="text"
         formControlName="tituloCancion"
-        placeholder="Nombre de la canción">
+        placeholder="Título de la canción">
     </div>
 
-    <!-- ================= TONO ================= -->
-    <div class="form-group">
-      <label>Tono Original *</label>
+    <!-- CONTROLES (ESPACIO RESTANTE) -->
+    <div class="form-group controls-cell">
+      <label>&nbsp;</label>
 
-      <div class="key-selector-inline">
-        <button
-          type="button"
-          class="transpose-btn"
-          (click)="transposeDown()">
-          <lucide-icon name="chevron-down"></lucide-icon>
-        </button>
+      <div class="controls-row">
 
-        <span class="current-key">
-          {{ songForm.get('tonoOriginal')?.value }}
-        </span>
+        <!-- TONO -->
+        <div class="key-selector-inline">
+          <button
+            pButton
+            type="button"
+            icon="pi pi-chevron-down"
+            class="p-button-text"
+            (click)="transposeDown()">
+          </button>
 
-        <button
-          type="button"
-          class="transpose-btn"
-          (click)="transposeUp()">
-          <lucide-icon name="chevron-up"></lucide-icon>
-        </button>
-      </div>
-    </div>
+          <span class="current-key">
+            {{ songForm.get('tonoOriginal')?.value }}
+          </span>
 
-    <!-- ================= CATEGORÍA ================= -->
-    <div class="form-group">
-      <label for="idCategoria">Categoría *</label>
-      <select
-        id="idCategoria"
-        formControlName="idCategoria"
-        [disabled]="categoriasCargando">
-        <option value="">
-          {{ categoriasCargando ? 'Cargando...' : 'Seleccionar categoría' }}
-        </option>
-        <option
-          *ngFor="let cat of categorias"
-          [value]="cat.id">
-          {{ cat.descripcionCategoria }}
-        </option>
-      </select>
-    </div>
-
-    <!-- ================= BUSCAR / SELECCIONAR CANCIÓN ================= -->
-    <div class="form-group span-2">
-      <label for="songAutocomplete">Buscar canción</label>
-
-      <p-autoComplete
-  formControlName="tituloCancion"
-  [suggestions]="filteredSongs"
-  (completeMethod)="filterSongs($event)"
-  (onSelect)="onSongSelected($event)"
-  optionLabel="tituloCancion"
-  placeholder="Buscar por título o letra"
-  [forceSelection]="true"
-  [dropdown]="true"
-  class="w-full">
-</p-autoComplete>
-    </div>
-
-    <!-- ================= LETRA ================= -->
-    <div class="form-group span-2">
-      <label for="letra">Letra con acordes *</label>
-
-      <div class="lyrics-editor-wrapper">
-        
-        <div
-          class="lyrics-backdrop"
-          [innerHTML]="highlightedLyrics">
+          <button
+            pButton
+            type="button"
+            icon="pi pi-chevron-up"
+            class="p-button-text"
+            (click)="transposeUp()">
+          </button>
         </div>
 
-        <textarea
-          id="letra"
-          formControlName="letra"
-          rows="15"
-          (scroll)="syncScroll($event)"
-          spellcheck="false"
-          autocomplete="off">
-        </textarea>
-        
-      </div>
+        <!-- MODO -->
+        <div class="mode-toggle-inline">
+          <button
+            pButton
+            type="button"
+            label="Editar"
+            size="small"
+            [class.p-button-outlined]="mode !== 'edit'"
+            (click)="mode = 'edit'">
+          </button>
 
-      <small>
-        Escribe una línea con los acordes y debajo la letra correspondiente
-      </small>
+          <button
+            pButton
+            type="button"
+            label="Ver"
+            size="small"
+            [class.p-button-outlined]="mode !== 'view'"
+            (click)="mode = 'view'">
+          </button>
+        </div>
+
+      </div>
     </div>
 
-    <!-- ================= ACCIONES ================= -->
+    <!-- CATEGORÍA (50%) -->
+    <div class="form-group">
+      <label>Categoría *</label>
+      <p-select
+        [options]="categorias"
+        optionLabel="descripcionCategoria"
+        optionValue="id"
+        formControlName="idCategoria">
+      </p-select>
+    </div>
+
+    <!-- BUSCAR CANCIÓN (50%) -->
+    <div class="form-group">
+      <label>Buscar canción existente</label>
+      <p-autoComplete
+        [suggestions]="filteredSongs"
+        (completeMethod)="filterSongs($event)"
+        (onSelect)="onSongSelected($event)"
+        optionLabel="tituloCancion"
+        placeholder="Buscar por título o letra"
+        [dropdown]="true">
+      </p-autoComplete>
+    </div>
+
+    <!-- EDICIÓN -->
+    <div class="form-group span-2" *ngIf="mode === 'edit'">
+      <label>Letra con acordes *</label>
+      <textarea
+        pInputTextarea
+        rows="15"
+        formControlName="letra"
+        spellcheck="false">
+      </textarea>
+    </div>
+
+    <!-- VISTA -->
+    <div class="form-group span-2" *ngIf="mode === 'view'">
+      <label>Vista previa</label>
+      <div class="song-view" [innerHTML]="highlightedLyrics"></div>
+    </div>
+
+    <!-- ACCIONES -->
     <div class="form-actions span-2">
       <button
+        pButton
         type="button"
-        class="btn-secondary"
+        label="Cancelar"
+        class="p-button-secondary"
         (click)="onCancel()">
-        Cancelar
       </button>
 
       <button
+        pButton
         type="submit"
-        class="btn-primary"
+        label="Guardar Canción"
         [disabled]="songForm.invalid">
-        {{ songToEdit() ? 'Actualizar' : 'Guardar' }} Canción
       </button>
     </div>
 
   </form>
-
-  <!-- ================= EXPORTAR ================= -->
-  <div class="export-actions">
-    <h3>Exportar</h3>
-
-    <button
-      class="btn-secondary"
-      (click)="exportPDF()">
-      PDF
-    </button>
-    
-
-    <button
-      class="btn-secondary"
-      (click)="exportPPT()">
-      PPT
-    </button>
-
-    <button
-      class="btn-secondary"
-      (click)="exportJPG()">
-      JPG
-    </button>
-  </div>
-
 </div>

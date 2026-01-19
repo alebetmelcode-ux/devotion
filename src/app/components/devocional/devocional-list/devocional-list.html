@@ -3,11 +3,14 @@
   <h2>Devocionales</h2>
   <button [routerLink]="['/devocionales/nuevo']" class="btn-primary">Nuevo Devocional</button>
   
-  <ul>
-    <li *ngFor="let devocional of devocionales$ | async">
-      <a [routerLink]="['/devocionales', devocional.id]">
-        {{ devocional.titulo }}
-      </a>
-    </li>
-  </ul>
+ <ul>
+      @for (d of devocionales; track d.id) {
+        <li>{{ d.id }} - {{ d.titulo }}</li>
+      }
+    </ul>
+
+
+
+
+  
 </div>
