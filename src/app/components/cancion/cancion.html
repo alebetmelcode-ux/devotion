@@ -2,6 +2,8 @@
 
 <div class="song-editor">
 
+
+  <h1>editar cancion</h1>
   <form [formGroup]="songForm" (ngSubmit)="saveSong()" class="form-grid">
 
     <!-- FILA INICIAL -->
@@ -17,7 +19,7 @@
 
     <!-- CONTROLES (ESPACIO RESTANTE) -->
     <div class="form-group controls-cell">
-      <label>&nbsp;</label>
+       <label>Subir/bajar Nota*</label>
 
       <div class="controls-row">
 
@@ -63,6 +65,16 @@
             [class.p-button-outlined]="mode !== 'view'"
             (click)="mode = 'view'">
           </button>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="export-buttons-inline">
+          <button pButton type="button" icon="pi pi-file-pdf" class="p-button-text" (click)="exportAs('pdf')" pTooltip="Exportar a PDF" tooltipPosition="bottom"></button>
+          <button pButton type="button" icon="pi pi-image" class="p-button-text" (click)="exportAs('jpg')" pTooltip="Exportar a JPG"tooltipPosition="bottom"></button>
+          <button pButton type="button" icon="pi pi-file-export" class="p-button-text" (click)="exportAs('ppt')" pTooltip="Exportar a PowerPoint"tooltipPosition="bottom"></button>
+          
+          <!-- New Import PDF Button -->
+        
         </div>
 
       </div>

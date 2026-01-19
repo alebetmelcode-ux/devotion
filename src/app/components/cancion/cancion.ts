@@ -3,7 +3,8 @@ import {
   inject,
   OnInit,
   EventEmitter,
-  Output
+  Output,
+  ViewEncapsulation
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -15,6 +16,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 
 /* Servicios */
 import { SongService } from '../../services/song.service';
@@ -28,6 +30,15 @@ import { Categoria } from '../../../interfaces/categoria';
 /* Componentes */
 import { ToolbarComponent } from '../toolbar/toolbar';
 
+/* Exportación */
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import PptxGenJS from 'pptxgenjs';
+
+/* Importación */
+
+
+
 @Component({
   selector: 'app-cancion',
   standalone: true,
@@ -39,10 +50,12 @@ import { ToolbarComponent } from '../toolbar/toolbar';
     AutoCompleteModule,
     SelectModule,
     ButtonModule,
-    ToolbarComponent
+    ToolbarComponent,
+    TooltipModule
   ],
   templateUrl: './cancion.html',
-  styleUrls: ['./cancion.css']
+  styleUrls: ['./cancion.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class Cancion implements OnInit {
 
@@ -118,120 +131,120 @@ export class Cancion implements OnInit {
 
   /* ==================== RENDER AVANZADO ==================== */
 
- updateHighlight(text: string): void {
-  if (!text) {
-    this.highlightedLyrics = '';
-    return;
-  }
-
-  const titulo = this.songForm.get('tituloCancion')?.value ?? '';
-  const tono = this.songForm.get('tonoOriginal')?.value ?? '';
-
-  const safeLines = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .split('\n');
-
-  let html = `
-    <div class="song-header">
-      <h1>${titulo}</h1>
-      <div class="song-meta">Tono: ${tono}</div>
-    </div>
-  `;
-
-  let sectionOpen = false;
-  let pendingChords: string | null = null;
-
-  for (let i = 0; i < safeLines.length; i++) {
-    const raw = safeLines[i];
-    const line = raw.trim();
-
-    /* ===== LÍNEA VACÍA ===== */
-    if (!line) {
-      pendingChords = null;
-      continue;
+  updateHighlight(text: string): void {
+    if (!text) {
+      this.highlightedLyrics = '';
+      return;
     }
 
-    /* ===== ENCABEZADOS ===== */
-    if (
-      line.startsWith('//') ||
-      /^(estrofa|verso|coro|chorus|verse)\b/i.test(line)
-    ) {
-      if (sectionOpen) {
-        html += `</section>`;
+    const titulo = this.songForm.get('tituloCancion')?.value ?? '';
+    const tono = this.songForm.get('tonoOriginal')?.value ?? '';
+
+    const lines = text.split('\n');
+
+    let html = `
+      <div class="song-header">
+        <h1>${this.escapeHtml(titulo)}</h1>
+        <div class="song-meta">Tono: ${this.escapeHtml(tono)}</div>
+      </div>
+    `;
+
+    let sectionOpen = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i];
+      const trimmed = raw.trim();
+
+      /* ===== LÍNEA VACÍA ===== */
+      if (!trimmed) {
+        continue;
       }
 
-      html += `<section><h3>${line.replace('//', '').trim()}</h3>`;
-      sectionOpen = true;
-      pendingChords = null;
-      continue;
-    }
-
-    /* ===== SOLO ACORDES ===== */
-    if (/^([A-G][#b]?(m|maj|min|dim|aug|sus|add)?\d*\s*)+$/.test(line)) {
-      pendingChords = line;
-      continue;
-    }
-
-    /* ===== ACORDES INLINE ===== */
-    const inlineRegex = /\[([^\]]+)\]/g;
-    if (inlineRegex.test(raw)) {
-      let chordLine = '';
-      let lyricLine = '';
-      let last = 0;
-      let match: RegExpExecArray | null;
-
-      while ((match = inlineRegex.exec(raw)) !== null) {
-        const before = raw.slice(last, match.index);
-        lyricLine += before;
-        chordLine += ' '.repeat(before.length) + match[1];
-        lyricLine += ' '.repeat(match[1].length);
-        last = inlineRegex.lastIndex;
+      /* ===== ENCABEZADOS DE SECCIÓN ===== */
+      if (this.isSectionHeader(trimmed)) {
+        if (sectionOpen) {
+          html += `</section>`;
+        }
+        html += `<section><h3>${this.escapeHtml(this.cleanSectionHeader(trimmed))}</h3>`;
+        sectionOpen = true;
+        continue;
       }
 
-      const rest = raw.slice(last);
-      lyricLine += rest;
-      chordLine += ' '.repeat(rest.length);
-
-      html += `
-        <div class="music-line">
-          <div class="chords">
-            ${chordLine.replace(/(\S+)/g, '<span class="chord">$1</span>')}
+      /* ===== LÍNEAS CON ACORDES INLINE [Am] ===== */
+      if (this.hasInlineChords(raw)) {
+        const { chordLine, lyricLine } = this.parseInlineChords(raw);
+        
+        html += `
+          <div class="music-line">
+            <div class="chords">${chordLine}</div>
+            <div class="lyrics">${lyricLine}</div>
           </div>
-          <div class="lyrics">${lyricLine}</div>
-        </div>
-      `;
-      pendingChords = null;
-      continue;
+        `;
+        continue;
+      }
+
+      /* ===== LETRA SIMPLE ===== */
+      html += `<div class="lyrics">${this.escapeHtml(raw)}</div>`;
     }
 
-    /* ===== LETRA NORMAL ===== */
-    if (pendingChords) {
-      const chordHtml = pendingChords.replace(
-        /([A-G][#b]?(m|maj|min|dim|aug|sus|add)?\d*)/g,
-        '<span class="chord">$1</span>'
-      );
-
-      html += `
-        <div class="music-line">
-          <div class="chords">${chordHtml}</div>
-          <div class="lyrics">${raw}</div>
-        </div>
-      `;
-      pendingChords = null;
-    } else {
-      html += `<div class="lyrics">${raw}</div>`;
+    if (sectionOpen) {
+      html += `</section>`;
     }
+
+    this.highlightedLyrics = html;
   }
 
-  if (sectionOpen) {
-    html += `</section>`;
+  private isSectionHeader(line: string): boolean {
+    return /^(coro|estrofa|verso|verse|chorus|bridge|intro|outro|pre-coro|pre-chorus)(\s+\d+|\s+[IVX]+)?$/i.test(line);
   }
 
-  this.highlightedLyrics = html;
-}
+  private cleanSectionHeader(line: string): string {
+    return line.replace(/^\/\/\s*/, '');
+  }
 
+  private hasInlineChords(line: string): boolean {
+    return /\[([^\]]+)\]/.test(line);
+  }
+
+  private parseInlineChords(raw: string): { chordLine: string; lyricLine: string } {
+    // 1. Get the pure lyric line by removing chord markers
+    const lyricLine = this.escapeHtml(raw.replace(/\[[^\]]+\]/g, ''));
+
+    // 2. Build the chord line, using the raw string for positioning
+    let chordLine = '';
+    let i = 0;
+    while (i < raw.length) {
+      if (raw[i] === '[') {
+        const chordEnd = raw.indexOf(']', i);
+        if (chordEnd !== -1) {
+          const chord = raw.substring(i + 1, chordEnd);
+          // Add the styled chord
+          chordLine += `<span class="chord">${this.escapeHtml(chord)}</span>`;
+          // Advance the index past the entire chord marker
+          i = chordEnd + 1;
+        } else {
+          // Unmatched '[', treat as a literal character
+          chordLine += ' ';
+          i++;
+        }
+      } else {
+        // It's a regular character in the lyric, so add a space to the chord line
+        chordLine += ' ';
+        i++;
+      }
+    }
+
+    return { chordLine, lyricLine };
+  }
+
+  private escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
   /* ==================== TRANSPOSICIÓN ==================== */
 
@@ -257,8 +270,25 @@ export class Cancion implements OnInit {
 
   saveSong(): void {
     if (this.songForm.invalid) return;
+
+    const newTitle = this.songForm.get('tituloCancion')?.value;
+    const currentId = this.songForm.get('id')?.value;
+
+    // Validate for duplicate title
+    const isDuplicate = this.songs.some(song =>
+      song.id !== currentId && song.tituloCancion.toLowerCase() === newTitle.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      alert('Ya existe una canción con este título. Por favor, elige otro.');
+      return; // Prevent saving
+    }
+
     this.songService.addSong(this.songForm.getRawValue())
-      .subscribe(() => this.songSaved.emit());
+      .subscribe(() => {
+        this.songSaved.emit();
+        alert('Canción guardada con éxito.'); // Añadido para notificar al usuario
+      });
   }
 
   onCancel(): void {
@@ -266,4 +296,111 @@ export class Cancion implements OnInit {
     this.cancel.emit();
     this.router.navigate(['/cancion']);
   }
-}
+
+  /* ==================== EXPORTACIÓN ==================== */
+
+  exportAs(format: 'pdf' | 'jpg' | 'ppt'): void {
+    const songViewElement = document.querySelector('.song-view') as HTMLElement;
+    
+    const exportAction = () => {
+      const elementToExport = document.querySelector('.song-view') as HTMLElement;
+      if (!elementToExport) {
+        console.error('Elemento .song-view no encontrado para exportar.');
+        return;
+      }
+      this.runExport(format, elementToExport);
+    };
+
+    if (this.mode !== 'view') {
+      this.mode = 'view';
+      setTimeout(exportAction, 100); // Espera a que Angular renderice
+    } else {
+      exportAction();
+    }
+  }
+
+  private runExport(format: 'pdf' | 'jpg' | 'ppt', element: HTMLElement) {
+    const title = this.songForm.get('tituloCancion')?.value || 'cancion';
+    const fileName = title.replace(/ /g, '_');
+
+    switch (format) {
+      case 'pdf':
+        this.exportAsPdf(element, fileName);
+        break;
+      case 'jpg':
+        this.exportAsJpg(element, fileName);
+        break;
+      case 'ppt':
+        this.exportAsPpt(fileName);
+        break;
+    }
+  }
+
+  private exportAsPdf(element: HTMLElement, fileName: string): void {
+    html2canvas(element).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${fileName}.pdf`);
+    });
+  }
+
+  private exportAsJpg(element: HTMLElement, fileName: string): void {
+    html2canvas(element).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `${fileName}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg');
+      link.click();
+    });
+  }
+
+  private exportAsPpt(fileName: string): void {
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_16x9';
+
+    const title = this.songForm.get('tituloCancion')?.value || 'Canción';
+    const tone = this.songForm.get('tonoOriginal')?.value || '';
+    const rawLyrics = this.songForm.get('letra')?.value || '';
+
+    // Diapositiva de Título
+    const titleSlide = pptx.addSlide();
+    titleSlide.addText(title, { x: 0.5, y: 2.5, w: '90%', h: 1, align: 'center', fontSize: 48, bold: true, color: '1F4788' });
+    titleSlide.addText(`Tono: ${tone}`, { x: 0.5, y: 3.5, w: '90%', h: 1, align: 'center', fontSize: 24, color: '666666' });
+
+    // Diapositivas de Letra
+    const lines = rawLyrics.split('\n');
+    const MAX_LINES_PER_SLIDE = 8;
+    let slide = pptx.addSlide();
+    let lineCount = 0;
+
+    for (const rawLine of lines) {
+      if (lineCount >= MAX_LINES_PER_SLIDE) {
+        slide = pptx.addSlide();
+        lineCount = 0;
+      }
+
+      const trimmedLine = rawLine.trim();
+      if (!trimmedLine) continue;
+
+      if (this.hasInlineChords(rawLine)) {
+        const { chordLine, lyricLine } = this.parseInlineChords(rawLine);
+        const plainChordLine = chordLine.replace(/<[^>]*>/g, '');
+
+        slide.addText(plainChordLine, { x: 0.5, y: 0.5 + lineCount * 0.8, w: '90%', h: 0.4, fontFace: 'Courier New', fontSize: 18, color: '1F4788', bold: true });
+        slide.addText(lyricLine, { x: 0.5, y: 0.8 + lineCount * 0.8, w: '90%', h: 0.4, fontFace: 'Courier New', fontSize: 18, color: '000000' });
+        lineCount += 1.5;
+      } else {
+        const isHeader = this.isSectionHeader(trimmedLine);
+        slide.addText(rawLine, { x: 0.5, y: 0.8 + lineCount * 0.8, w: '90%', h: 0.4, fontSize: isHeader ? 16 : 18, bold: isHeader });
+        lineCount++;
+      }
+    }
+
+    pptx.writeFile({ fileName: `${fileName}.pptx` });
+  }
+
+  /* ==================== IMPORTACIÓN ==================== */
+
+ }

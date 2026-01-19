@@ -54,20 +54,137 @@
   gap: 8px;
 }
 
-/* VISTA */
+/* EXPORTAR */
+.export-buttons-inline {
+  display: flex;
+  gap: 4px; /* Menos espacio para botones de solo icono */
+  margin-left: auto; /* Empuja los botones de exportación a la derecha */
+}
+
+/* VISTA PREVIA */
 .song-view {
-  font-family: 'Courier New', monospace;
-  white-space: pre-wrap;
-  padding: 16px;
+  font-family: 'Courier New', Consolas, monospace;
+  padding: 20px;
   border: 1px solid #ddd;
   border-radius: 6px;
   background: #fafafa;
-  line-height: 1.6;
+  overflow-x: auto;
 }
 
-.chord {
+/* ENCABEZADO DE CANCIÓN */
+.song-header {
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1F4788;
+}
+
+.song-header h1 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
   color: #1F4788;
+  font-weight: 700;
+}
+
+.song-meta {
+  font-size: 13px;
+  color: #666;
   font-weight: 600;
+}
+
+/* SECCIONES */
+section {
+  margin-bottom: 12px;
+}
+
+section h3 {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* LÍNEAS DE MÚSICA */
+.music-line {
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.chords {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: pre;
+  margin-bottom: 0;
+}
+
+.lyrics {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: pre;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+/* Anula el margen para las letras que están dentro de una línea de música */
+.music-line .lyrics {
+  margin-bottom: 0;
+}
+
+.song-view .chords .chord {
+  color: #1F4788;
+  font-weight: 700;
+}
+
+/* Estilos personalizados de botones para que coincidan con el color de los acordes #1F4788 */
+.p-button.p-button-text {
+  color: #1F4788 !important;
+}
+
+.p-button.p-button-text:hover {
+  background-color: rgba(31, 71, 136, 0.05) !important; /* Tinte claro al pasar el ratón */
+}
+
+/* Botón primario por defecto (Guardar Canción) */
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary) {
+  background: #1F4788 !important;
+  border-color: #1F4788 !important;
+  color: #ffffff !important;
+}
+
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):hover {
+  background: #183a6a !important; /* Ligeramente más oscuro al pasar el ratón */
+  border-color: #183a6a !important;
+}
+
+/* Botones con contorno (Editar/Ver cuando no están seleccionados) */
+.p-button.p-button-outlined {
+  color: #1F4788 !important;
+  border-color: #1F4788 !important;
+  background-color: transparent !important;
+}
+
+.p-button.p-button-outlined:hover {
+  background-color: rgba(31, 71, 136, 0.05) !important;
+}
+
+/* Botón secundario (Cancelar) */
+.p-button.p-button-secondary {
+  background: #6c757d !important; /* Gris para el botón secundario (Cancelar) */
+  border-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-secondary:hover {
+  background: #5c636a !important; /* Ligeramente más oscuro en hover */
+  border-color: #5c636a !important;
+}
+
+/* LÍNEA VACÍA */
+.empty-line {
+  height: 8px;
 }
 
 /* ACCIONES */
@@ -75,4 +192,31 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+/* === DISEÑO RESPONSIVO === */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr; /* Cambia a una sola columna en pantallas pequeñas */
+    gap: 16px; /* Reduce el espacio entre elementos */
+  }
+
+  /* Los elementos que ocupaban 2 columnas ahora ocuparán 1 automáticamente */
+  .span-2 {
+    grid-column: span 1;
+  }
+
+  .controls-row {
+    width: 100%;
+    justify-content: space-between; /* Distribuye los controles de tono y modo */
+  }
+
+  .form-actions {
+    flex-direction: column; /* Apila los botones de acción verticalmente */
+    gap: 10px;
+  }
+
+  .form-actions .p-button {
+    width: 100%; /* Hace que los botones de acción ocupen todo el ancho */
+  }
 }
