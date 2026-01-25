@@ -1,0 +1,44 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div
+  cdkDropList
+  (cdkDropListDropped)="drop($event)"
+  class="lista-canciones"
+  [class.bloqueado]="guardando">
+
+  <div
+    *ngFor="let cancion of canciones; let i = index"
+    cdkDrag
+    class="cancion-item">
+
+    <span cdkDragHandle class="handle">☰</span>
+
+    <div class="info">
+      <span class="titulo">
+        {{ i + 1 }}. {{ cancion.tituloCancion }}
+      </span>
+      <span class="tono">
+        {{ cancion.tonoOriginal }}
+      </span>
+    </div>
+
+    <button
+      pButton
+      icon="pi pi-trash"
+      severity="danger"
+      rounded
+      text
+      (click)="confirmarEliminar(cancion)">
+    </button>
+
+  </div>
+</div>
+
+<p *ngIf="guardando" class="guardando">
+  Procesando cambios...
+</p>
+
+<p *ngIf="!guardando && canciones.length === 0" class="vacio">
+  No hay canciones en este devocional.
+</p>

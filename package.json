@@ -23,6 +23,7 @@
   "private": true,
   "packageManager": "npm@10.8.2",
   "dependencies": {
+    "@angular/cdk": "~21.0.5",
     "@angular/common": "^21.0.0",
     "@angular/compiler": "^21.0.0",
     "@angular/core": "^21.0.0",
@@ -32,6 +33,7 @@
     "@primeuix/themes": "^2.0.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.0.0",
+    "jwt-decode": "^4.0.0",
     "lucide-angular": "^0.561.0",
     "ngx-cookie-service": "^21.1.0",
     "pptxgenjs": "^4.0.1",

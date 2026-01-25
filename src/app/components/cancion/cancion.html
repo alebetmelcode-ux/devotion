@@ -3,7 +3,7 @@
 <div class="song-editor">
 
 
-  <h1>editar cancion</h1>
+  <h1>Editar cancion</h1>
   <form [formGroup]="songForm" (ngSubmit)="saveSong()" class="form-grid">
 
     <!-- FILA INICIAL -->
@@ -100,6 +100,7 @@
         (onSelect)="onSongSelected($event)"
         optionLabel="tituloCancion"
         placeholder="Buscar por título o letra"
+        
         [dropdown]="true">
       </p-autoComplete>
     </div>
@@ -111,7 +112,8 @@
         pInputTextarea
         rows="15"
         formControlName="letra"
-        spellcheck="false">
+        spellcheck="false"
+        class="chords-textarea">
       </textarea>
     </div>
 
@@ -137,6 +139,15 @@
         label="Guardar Canción"
         [disabled]="songForm.invalid">
       </button>
+
+      <button
+        *ngIf="songForm.get('id')?.value"
+                pButton
+                type="button"
+                label="Eliminar Canción"
+                class="p-button-danger"
+                (click)="deleteSong()">
+              </button>
     </div>
 
   </form>

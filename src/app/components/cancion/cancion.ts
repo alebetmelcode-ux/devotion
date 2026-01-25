@@ -35,10 +35,6 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import PptxGenJS from 'pptxgenjs';
 
-/* Importación */
-
-
-
 @Component({
   selector: 'app-cancion',
   standalone: true,
@@ -77,13 +73,21 @@ export class Cancion implements OnInit {
   highlightedLyrics = '';
   mode: 'edit' | 'view' = 'edit';
 
+  /* ==================== INIT ==================== */
+
   ngOnInit(): void {
     this.songForm = this.fb.group({
       id: [null],
       tituloCancion: ['', Validators.required],
       tonoOriginal: ['C', Validators.required],
+      tonoFinal: ['C'],              // UI-only
       idCategoria: [null, Validators.required],
       letra: ['', Validators.required]
+    });
+
+    // Sincronizar tonoFinal con tonoOriginal
+    this.songForm.get('tonoOriginal')!.valueChanges.subscribe(tono => {
+      this.songForm.get('tonoFinal')!.setValue(tono, { emitEvent: false });
     });
 
     this.songForm.get('letra')!
@@ -103,9 +107,9 @@ export class Cancion implements OnInit {
   }
 
   loadSongs(): void {
-    this.songService.getSongs().subscribe((res: any) => {
-      this.songs = res.resultado ?? res;
-      this.filteredSongs = [...this.songs];
+    this.songService.getSongs().subscribe(songs => {
+      this.songs = songs;
+      this.filteredSongs = [...songs];
     });
   }
 
@@ -113,19 +117,22 @@ export class Cancion implements OnInit {
     const query = (event.query ?? '').toLowerCase();
     this.filteredSongs = this.songs.filter(song =>
       song.tituloCancion.toLowerCase().includes(query) ||
-      song.letra?.toLowerCase().includes(query)
+      song.letra.toLowerCase().includes(query)
     );
   }
 
   onSongSelected(event: any): void {
     const song: Song = event.value;
+
     this.songForm.patchValue({
       id: song.id,
       tituloCancion: song.tituloCancion,
       tonoOriginal: song.tonoOriginal,
+      tonoFinal: song.tonoOriginal, // derivado, no backend
       idCategoria: song.idCategoria,
       letra: song.letra
     });
+
     this.updateHighlight(song.letra);
   }
 
@@ -151,29 +158,19 @@ export class Cancion implements OnInit {
 
     let sectionOpen = false;
 
-    for (let i = 0; i < lines.length; i++) {
-      const raw = lines[i];
+    for (const raw of lines) {
       const trimmed = raw.trim();
+      if (!trimmed) continue;
 
-      /* ===== LÍNEA VACÍA ===== */
-      if (!trimmed) {
-        continue;
-      }
-
-      /* ===== ENCABEZADOS DE SECCIÓN ===== */
       if (this.isSectionHeader(trimmed)) {
-        if (sectionOpen) {
-          html += `</section>`;
-        }
+        if (sectionOpen) html += `</section>`;
         html += `<section><h3>${this.escapeHtml(this.cleanSectionHeader(trimmed))}</h3>`;
         sectionOpen = true;
         continue;
       }
 
-      /* ===== LÍNEAS CON ACORDES INLINE [Am] ===== */
       if (this.hasInlineChords(raw)) {
         const { chordLine, lyricLine } = this.parseInlineChords(raw);
-        
         html += `
           <div class="music-line">
             <div class="chords">${chordLine}</div>
@@ -183,14 +180,10 @@ export class Cancion implements OnInit {
         continue;
       }
 
-      /* ===== LETRA SIMPLE ===== */
       html += `<div class="lyrics">${this.escapeHtml(raw)}</div>`;
     }
 
-    if (sectionOpen) {
-      html += `</section>`;
-    }
-
+    if (sectionOpen) html += `</section>`;
     this.highlightedLyrics = html;
   }
 
@@ -207,28 +200,22 @@ export class Cancion implements OnInit {
   }
 
   private parseInlineChords(raw: string): { chordLine: string; lyricLine: string } {
-    // 1. Get the pure lyric line by removing chord markers
     const lyricLine = this.escapeHtml(raw.replace(/\[[^\]]+\]/g, ''));
 
-    // 2. Build the chord line, using the raw string for positioning
     let chordLine = '';
     let i = 0;
+
     while (i < raw.length) {
       if (raw[i] === '[') {
-        const chordEnd = raw.indexOf(']', i);
-        if (chordEnd !== -1) {
-          const chord = raw.substring(i + 1, chordEnd);
-          // Add the styled chord
-          chordLine += `<span class="chord">${this.escapeHtml(chord)}</span>`;
-          // Advance the index past the entire chord marker
-          i = chordEnd + 1;
+        const end = raw.indexOf(']', i);
+        if (end !== -1) {
+          chordLine += `<span class="chord">${this.escapeHtml(raw.substring(i + 1, end))}</span>`;
+          i = end + 1;
         } else {
-          // Unmatched '[', treat as a literal character
           chordLine += ' ';
           i++;
         }
       } else {
-        // It's a regular character in the lyric, so add a space to the chord line
         chordLine += ' ';
         i++;
       }
@@ -260,60 +247,100 @@ export class Cancion implements OnInit {
     const letra = this.songForm.get('letra')?.value ?? '';
     const tono = this.songForm.get('tonoOriginal')?.value ?? '';
 
+    const newTono = this.transposeService.transposeChord(tono, semitones);
+
     this.songForm.patchValue({
       letra: this.transposeService.transposeText(letra, semitones),
-      tonoOriginal: this.transposeService.transposeChord(tono, semitones)
+      tonoOriginal: newTono,
+      tonoFinal: newTono
     });
   }
 
   /* ==================== ACCIONES ==================== */
 
   saveSong(): void {
-    if (this.songForm.invalid) return;
-
-    const newTitle = this.songForm.get('tituloCancion')?.value;
-    const currentId = this.songForm.get('id')?.value;
-
-    // Validate for duplicate title
-    const isDuplicate = this.songs.some(song =>
-      song.id !== currentId && song.tituloCancion.toLowerCase() === newTitle.toLowerCase()
-    );
-
-    if (isDuplicate) {
-      alert('Ya existe una canción con este título. Por favor, elige otro.');
-      return; // Prevent saving
+    if (this.songForm.invalid) {
+      alert('Por favor, completa todos los campos requeridos.');
+      return;
     }
 
-    this.songService.addSong(this.songForm.getRawValue())
-      .subscribe(() => {
+    const formValue = this.songForm.getRawValue();
+
+    const payload: any = {
+      id: formValue.id,
+      tituloCancion: formValue.tituloCancion,
+      tonoOriginal: formValue.tonoOriginal,
+      idCategoria: formValue.idCategoria,
+      letra: formValue.letra
+    };
+
+    const isNew = !payload.id;
+    if (isNew) delete payload.id;
+
+    this.songService.saveSong(payload).subscribe({
+      next: () => {
+        alert(`Canción ${isNew ? 'creada' : 'actualizada'} con éxito.`);
         this.songSaved.emit();
-        alert('Canción guardada con éxito.'); // Añadido para notificar al usuario
-      });
+        this.resetForm();
+        this.loadSongs();
+      },
+      error: (err) => {
+        console.error('Error al guardar la canción:', err);
+        alert('Ocurrió un error al guardar la canción.');
+      }
+    });
+  }
+
+  deleteSong(): void {
+    const id = this.songForm.get('id')?.value;
+    if (!id) return;
+
+    if (!confirm('¿Estás seguro de que deseas eliminar esta canción?')) return;
+
+    this.songService.deleteSong(id).subscribe({
+      next: () => {
+        alert('Canción eliminada con éxito.');
+        this.songSaved.emit();
+        this.resetForm();
+        this.loadSongs();
+      },
+      error: (err) => {
+        console.error('Error al eliminar:', err);
+        alert('Ocurrió un error al eliminar.');
+      }
+    });
   }
 
   onCancel(): void {
-    this.songForm.reset({ tonoOriginal: 'C' });
+    this.resetForm();
     this.cancel.emit();
-    this.router.navigate(['/cancion']);
+  }
+
+  private resetForm(): void {
+    this.songForm.reset({
+      id: null,
+      tituloCancion: '',
+      tonoOriginal: 'C',
+      tonoFinal: 'C',
+      idCategoria: null,
+      letra: ''
+    });
+
+    this.updateHighlight('');
   }
 
   /* ==================== EXPORTACIÓN ==================== */
 
   exportAs(format: 'pdf' | 'jpg' | 'ppt'): void {
-    const songViewElement = document.querySelector('.song-view') as HTMLElement;
-    
     const exportAction = () => {
-      const elementToExport = document.querySelector('.song-view') as HTMLElement;
-      if (!elementToExport) {
-        console.error('Elemento .song-view no encontrado para exportar.');
-        return;
-      }
-      this.runExport(format, elementToExport);
+      const element = document.querySelector('.song-view') as HTMLElement;
+      if (!element) return;
+      this.runExport(format, element);
     };
 
     if (this.mode !== 'view') {
       this.mode = 'view';
-      setTimeout(exportAction, 100); // Espera a que Angular renderice
+      setTimeout(exportAction, 100);
     } else {
       exportAction();
     }
@@ -323,26 +350,17 @@ export class Cancion implements OnInit {
     const title = this.songForm.get('tituloCancion')?.value || 'cancion';
     const fileName = title.replace(/ /g, '_');
 
-    switch (format) {
-      case 'pdf':
-        this.exportAsPdf(element, fileName);
-        break;
-      case 'jpg':
-        this.exportAsJpg(element, fileName);
-        break;
-      case 'ppt':
-        this.exportAsPpt(fileName);
-        break;
-    }
+    if (format === 'pdf') this.exportAsPdf(element, fileName);
+    if (format === 'jpg') this.exportAsJpg(element, fileName);
+    if (format === 'ppt') this.exportAsPpt(fileName);
   }
 
   private exportAsPdf(element: HTMLElement, fileName: string): void {
     html2canvas(element).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      const width = pdf.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, width, height);
       pdf.save(`${fileName}.pdf`);
     });
   }
@@ -364,43 +382,24 @@ export class Cancion implements OnInit {
     const tone = this.songForm.get('tonoOriginal')?.value || '';
     const rawLyrics = this.songForm.get('letra')?.value || '';
 
-    // Diapositiva de Título
     const titleSlide = pptx.addSlide();
-    titleSlide.addText(title, { x: 0.5, y: 2.5, w: '90%', h: 1, align: 'center', fontSize: 48, bold: true, color: '1F4788' });
-    titleSlide.addText(`Tono: ${tone}`, { x: 0.5, y: 3.5, w: '90%', h: 1, align: 'center', fontSize: 24, color: '666666' });
+    titleSlide.addText(title, { x: 0.5, y: 2.5, w: '90%', fontSize: 48, bold: true, align: 'center' });
+    titleSlide.addText(`Tono: ${tone}`, { x: 0.5, y: 3.5, w: '90%', fontSize: 24, align: 'center' });
 
-    // Diapositivas de Letra
     const lines = rawLyrics.split('\n');
-    const MAX_LINES_PER_SLIDE = 8;
     let slide = pptx.addSlide();
     let lineCount = 0;
 
-    for (const rawLine of lines) {
-      if (lineCount >= MAX_LINES_PER_SLIDE) {
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      if (lineCount >= 8) {
         slide = pptx.addSlide();
         lineCount = 0;
       }
-
-      const trimmedLine = rawLine.trim();
-      if (!trimmedLine) continue;
-
-      if (this.hasInlineChords(rawLine)) {
-        const { chordLine, lyricLine } = this.parseInlineChords(rawLine);
-        const plainChordLine = chordLine.replace(/<[^>]*>/g, '');
-
-        slide.addText(plainChordLine, { x: 0.5, y: 0.5 + lineCount * 0.8, w: '90%', h: 0.4, fontFace: 'Courier New', fontSize: 18, color: '1F4788', bold: true });
-        slide.addText(lyricLine, { x: 0.5, y: 0.8 + lineCount * 0.8, w: '90%', h: 0.4, fontFace: 'Courier New', fontSize: 18, color: '000000' });
-        lineCount += 1.5;
-      } else {
-        const isHeader = this.isSectionHeader(trimmedLine);
-        slide.addText(rawLine, { x: 0.5, y: 0.8 + lineCount * 0.8, w: '90%', h: 0.4, fontSize: isHeader ? 16 : 18, bold: isHeader });
-        lineCount++;
-      }
+      slide.addText(line, { x: 0.5, y: 0.5 + lineCount * 0.6, w: '90%' });
+      lineCount++;
     }
 
     pptx.writeFile({ fileName: `${fileName}.pptx` });
   }
-
-  /* ==================== IMPORTACIÓN ==================== */
-
- }
+}

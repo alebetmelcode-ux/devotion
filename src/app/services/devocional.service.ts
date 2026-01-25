@@ -1,43 +1,107 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Devocional } from '../models/devocional.model';
+import { DevocionalCancionDetalle } from '../models/devocional-cancion-detalle.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DevocionalService {
-  addSongToDevocional(arg0: { id: number; 'id-devocional': number; 'id-cancion': number; 'posicion-cancion': number; 'acordes-finales': any; }) {
-    throw new Error('Method not implemented.');
-  }
-  addDevocional(arg0: { id: number; titulo: any; }) {
-    throw new Error('Method not implemented.');
-  }
-  getDevocionalById(devocionalId: number): Observable<Devocional | undefined> {
-    throw new Error('Method not implemented.');
-  }
 
   private readonly apiUrl = 'http://localhost:5138/api/Devocional';
 
   constructor(private http: HttpClient) {}
 
+  // ============================
+  // GET: todos los devocionales
+  // ============================
   obtenerTodos(): Observable<Devocional[]> {
-    return this.http.get<Devocional[]>(this.apiUrl);
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(res => res.resultado ?? [])
+    );
   }
 
+  // ============================
+  // GET: devocional por id
+  // ============================
   obtenerPorId(id: number): Observable<Devocional> {
-    return this.http.get<Devocional>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(res => res.resultado as Devocional)
+    );
   }
 
-  crear(devocional: Devocional): Observable<Devocional> {
-    return this.http.post<Devocional>(this.apiUrl, devocional);
+  // ============================
+  // POST: crear devocional
+  // ============================
+  crear(nombreDevocional: string): Observable<Devocional> {
+    return this.http.post<any>(this.apiUrl, { nombreDevocional }).pipe(
+      map(res => res.resultado)
+    );
   }
 
-  actualizar(id: number, devocional: Devocional): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, devocional);
+  // ============================
+  // PUT: editar devocional
+  // ============================
+  actualizar(devocional: Devocional): Observable<void> {
+    return this.http.put<void>(this.apiUrl, devocional);
   }
 
+  // ============================
+  // DELETE: eliminar devocional
+  // ============================
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  // ============================
+  // POST: agregar canciones al devocional
+  // ============================
+  agregarCanciones(
+    devocionalId: number,
+    cancionIds: number[]
+  ): Observable<void> {
+    return this.http.post<void>(
+      `${this.apiUrl}/agregar-canciones`,
+      { devocionalId, cancionIds }
+    );
+  }
+
+  // ============================
+  // GET: obtener canciones del devocional
+  // ============================
+  obtenerCanciones(
+    devocionalId: number
+  ): Observable<DevocionalCancionDetalle[]> {
+    return this.http.get<any>(
+      `${this.apiUrl}/${devocionalId}/canciones`
+    ).pipe(
+      map(res => res.resultado ?? [])
+    );
+  }
+
+  // ============================
+  // PUT: reordenar canciones
+  // ============================
+  reordenarCanciones(
+    devocionalId: number,
+    canciones: { cancionId: number; posicionCancion: number }[]
+  ): Observable<void> {
+    return this.http.put<void>(
+      `${this.apiUrl}/${devocionalId}/reordenar-canciones`,
+      canciones
+    );
+  }
+
+  // ============================
+  // DELETE: eliminar canción SOLO del devocional
+  // ============================
+  eliminarCancion(
+    devocionalId: number,
+    cancionId: number
+  ): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/${devocionalId}/canciones/${cancionId}`
+    );
   }
 }

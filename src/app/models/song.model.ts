@@ -1,8 +1,7 @@
 export interface Song {
-  id: number; // 👈 opcional
+  id: number;
   tituloCancion: string;
   tonoOriginal: string;
-  tonoFinal: string;
   idCategoria: number;
   letra: string;
 }
