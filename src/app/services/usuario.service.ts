@@ -1,33 +1,46 @@
+
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Sesion } from '../../interfaces/sesion';
+import { environment } from '../../environments/environment';
 import { Login } from '../../interfaces/login';
-import { ApiResponse } from '../../interfaces/ApiResponse';
+import { Sesion } from '../../interfaces/sesion';
 import { Registro } from '../models/registro.model';
+import { ApiResponse } from '../../interfaces/ApiResponse';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UsuarioService {
-  baseUrl: string = environment.apiUrl + 'usuario/';
+
+  // ⚠️ Coincide EXACTAMENTE con Swagger: /api/Usuario
+  private readonly baseUrl = `${environment.apiUrl}Usuario/`;
 
   constructor(private http: HttpClient) {}
 
+  // 🔐 LOGIN → POST /api/Usuario/login
   iniciarSesion(request: Login): Observable<Sesion> {
-    return this.http.post<Sesion>(`${this.baseUrl}login`, request);
+    return this.http.post<Sesion>(
+      `${this.baseUrl}login`,
+      request
+    );
   }
 
-  lista(): Observable<ApiResponse>{
-    return this.http.get<ApiResponse>(`${this.baseUrl}`);
-  }
-
+  // 📝 REGISTRO → POST /api/Usuario/registro
   registrar(request: Registro): Observable<Sesion> {
-    return this.http.post<Sesion>(`${this.baseUrl}registro`, request);
+    return this.http.post<Sesion>(
+      `${this.baseUrl}registro`,
+      request
+    );
   }
 
-  listadoRoles(): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.baseUrl}listadoRoles`);
+  // 📋 LISTAR USUARIOS → GET /api/Usuario (requiere token)
+  lista(): Observable<any> {
+    return this.http.get<any>(this.baseUrl);
+  }
+  listadoRoles(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(
+      `${this.baseUrl}listadoRoles`
+    );
   }
 }

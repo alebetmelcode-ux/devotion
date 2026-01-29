@@ -1,0 +1,54 @@
+.lista-canciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cancion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.cancion-item:hover {
+  background-color: #ffffff;
+}
+
+.handle {
+  cursor: grab;
+  color: #6b7280;
+}
+
+.info {
+  flex: 1;
+}
+
+.titulo {
+  font-weight: 500;
+}
+
+.tono {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.guardando {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #2563eb;
+}
+
+.vacio {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.bloqueado {
+  opacity: 0.6;
+  pointer-events: none;
+}

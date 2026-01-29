@@ -1,87 +1,105 @@
-.toolbar {
-  background-color: #1F4788;
-  color: white;
-  padding: 0 24px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* =========================
+   MENUBAR: estilo base PrimeNG
+========================= */
+:host ::ng-deep .p-menubar {
+  border-radius: 0;
 }
 
-.toolbar-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 64px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.toolbar-logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-decoration: none;
-  color: white;
-  display: flex; /* Make it a flex container to align image and text */
-  align-items: center; /* Vertically align items */
-  gap: 2px; /* Space between image and text */
-}
-
-.logo-image {
-  width: 150px;
-  height: auto;
-  
- 
-}
-
-.toolbar-menu-desktop a {
-  margin-left: 24px;
-  text-decoration: none;
-  color: white;
-  font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: background-color 0.2s;
-}
-
-.toolbar-menu-desktop a:hover,
-.toolbar-menu-desktop a.active-link {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.toolbar-menu-mobile-btn {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
+/* =========================
+   LOGO
+========================= */
+.logo-image img {
+  width: 160px;
+  height: 30px;
   cursor: pointer;
 }
 
-.toolbar-menu-mobile {
-  display: none;
+/* =========================
+   ALINEAR MENÚ A LA DERECHA
+========================= */
+:host ::ng-deep .p-menubar-root-list {
+  margin-left: auto;
+}
+
+/* =========================
+   LINK DEL ITEM (CLAVE)
+========================= */
+:host ::ng-deep .p-menubar .p-menuitem-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* =========================
+   ICONO BASE (CLAVE 🔥)
+========================= */
+:host ::ng-deep .p-menubar .menu-icon {
+  display: inline-flex !important;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+  visibility: visible !important;
+}
+
+/* =========================
+   HOVER BOTONES
+========================= */
+:host ::ng-deep
+.p-menubar
+.p-menubar-item
+.p-menubar-item-content
+a:hover {
   background-color: #1F4788;
-  padding-bottom: 16px;
+  color: aliceblue;
+  border-radius: 9px;
 }
 
-.toolbar-menu-mobile a {
-  display: block;
-  padding: 12px 24px;
-  text-decoration: none;
-  color: white;
-  font-weight: 500;
+/* ICONO EN HOVER */
+:host ::ng-deep
+.p-menubar
+.p-menubar-item
+.p-menubar-item-content
+a:hover
+.menu-icon {
+  color: aliceblue;
 }
 
-.toolbar-menu-mobile a.active-link {
-  background-color: rgba(255, 255, 255, 0.1);
+/* =========================
+   ITEM ACTIVO
+========================= */
+:host ::ng-deep
+.p-menubar
+.p-menubar-item.p-highlight
+.p-menubar-item-content
+a {
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
-@media (max-width: 768px) {
-  .toolbar-menu-desktop {
-    display: none;
-  }
+/* ICONO ACTIVO */
+:host ::ng-deep
+.p-menubar
+.p-menubar-item.p-highlight
+.p-menubar-item-content
+a
+.menu-icon {
+  color: inherit;
+}
 
-  .toolbar-menu-mobile-btn {
-    display: block;
-  }
-
-  .toolbar-menu-mobile.open {
-    display: block;
-  }
+/* =========================
+   TRANSICIONES
+========================= */
+:host ::ng-deep
+.p-menubar
+.p-menubar-item
+.p-menubar-item-content
+a,
+:host ::ng-deep
+.p-menubar
+.p-menubar-item
+.p-menubar-item-content
+a .menu-icon {
+  transition: background-color 0.15s ease, color 0.15s ease;
 }

@@ -1,13 +1,35 @@
 <app-toolbar></app-toolbar>
-<div class="devocional-detail-container" *ngIf="devocional$ | async as devocional">
-  <h2>{{ devocional.titulo }}</h2>
 
-  <div class="song-list">
-    <div *ngFor="let item of songs$ | async" class="song-item">
-      <h3>{{ item['posicion-cancion'] }}. {{ item.song?.tituloCancion }}</h3>
-      <p>Tono: {{ item['acordes-finales'] }}</p>
-    </div>
+<div class="devocional-detail-page">
+
+  <!-- CARGANDO -->
+  <div *ngIf="cargando" class="estado">
+    Cargando devocional...
   </div>
 
-  <button [routerLink]="['/devocionales']" class="btn-secondary">Volver a la lista</button>
+  <!-- ERROR -->
+  <div *ngIf="!cargando && errorCarga" class="estado error">
+    No se pudo cargar el devocional.
+    <button class="btn-secondary" routerLink="/devocionales">Volver</button>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div *ngIf="!cargando && !errorCarga && devocional" class="devocional-container">
+
+    <div class="devocional-header">
+      <h1>{{ devocional.nombreDevocional }}</h1>
+
+      <div class="actions">
+        <p-button class="btn-primary" (click)="irAgregarCanciones()">Agregar canciones</p-button>
+        <p-button class="btn-outline" (click)="activarEdicion()">Editar nombre</p-button>
+        <p-button class="btn-secondary" routerLink="/devocionales">Volver</p-button>
+      </div>
+    </div>
+
+    <app-devocional-canciones
+      [devocionalId]="devocional.id"
+      [canciones]="canciones">
+    </app-devocional-canciones>
+
+  </div>
 </div>

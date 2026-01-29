@@ -1,19 +1,31 @@
-<nav class="toolbar">
-  <div class="toolbar-container">
-    <a routerLink="/" class="toolbar-logo"><img src="assets/images/devotion4.png" alt="Devotion Logo" class="logo-image"> </a>
+<p-menubar [model]="items">
 
-    <div class="toolbar-menu-desktop">
-      <a routerLink="/cancion" routerLinkActive="active-link">Canciones</a>
-      <a routerLink="/devocionales" routerLinkActive="active-link">Devocionales</a>
+  <!-- LOGO (NO SE TOCA) -->
+  <ng-template pTemplate="start">
+     <div class="logo-image" (click)="irInicio()">
+      <img src="assets/images/devotion21.png" alt="DevotionLogo">
     </div>
+  </ng-template>
 
-    <button class="toolbar-menu-mobile-btn" (click)="toggleMenu()">
-      <lucide-icon [name]="isMenuOpen ? 'x' : 'menu'"></lucide-icon>
-    </button>
-  </div>
+  <!-- ITEMS DEL MENÚ (Canciones / Devocionales) -->
+  <ng-template pTemplate="item" let-item let-root="root">
+    <a
+      *ngIf="root"
+      class="p-menuitem-link"
+      (click)="item.command?.()">
 
-  <div class="toolbar-menu-mobile" [class.open]="isMenuOpen">
-    <a routerLink="/cancion" routerLinkActive="active-link" (click)="toggleMenu()">Canciones</a>
-    <a routerLink="/devocionales" routerLinkActive="active-link" (click)="toggleMenu()">Devocionales</a>
-  </div>
-</nav>
+      <i
+        class="menu-icon"
+        [ngClass]="{
+          'fa-solid fa-music': item.label === 'Canciones',
+          'fa-solid fa-book-bible': item.label === 'Devocionales'
+        }">
+      </i>
+
+      <span class="p-menuitem-text">
+        {{ item.label }}
+      </span>
+    </a>
+  </ng-template>
+
+</p-menubar>

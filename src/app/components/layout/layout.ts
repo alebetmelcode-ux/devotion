@@ -2,43 +2,44 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { CompartidoService } from '../../services/compartido.service';
 import { CookieService } from 'ngx-cookie-service';
-import { Drawer } from "primeng/drawer";
+import { Drawer } from 'primeng/drawer';
+import { Sesion } from '../../../interfaces/sesion';
 
 @Component({
   selector: 'app-layout',
+  standalone: true,
   imports: [RouterOutlet, Drawer],
   templateUrl: './layout.html',
   styleUrl: './layout.css',
 })
-export class Layout implements OnInit{
-menuItems: any;
-sidebarVisible: any;
-toggleSidebar() {
-throw new Error('Method not implemented.');
-}
+export class Layout implements OnInit {
 
- username: string = '';
+  menuItems: any[] = [];
+  sidebarVisible = false;
 
- constructor(private router: Router, private compartidoService: CompartidoService,
-             private cookieService: CookieService)
- {
- }
+  username: string | null = null;
+
+  constructor(
+    private router: Router,
+    private compartidoService: CompartidoService,
+    private cookieService: CookieService
+  ) {}
 
   ngOnInit(): void {
-    const usuarioSesion = this.compartidoService.obtenerSesion();
-    if(usuarioSesion!=null)
-    {
-      this.username = usuarioSesion;
-    }
+    const usuarioSesion: Sesion | null =
+      this.compartidoService.obtenerSesion();
+
+    // ✅ SOLO el nombre, no el objeto completo
+    this.username = usuarioSesion?.username || null;
   }
 
-   cerrarSesion() {
-     this.compartidoService.eliminarSesion();
+  toggleSidebar(): void {
+    this.sidebarVisible = !this.sidebarVisible;
+  }
 
-     this.cookieService.delete('Authorization','/');
-
-     this.router.navigate(['login']);
-   }
-
-
+  cerrarSesion(): void {
+    this.compartidoService.eliminarSesion();
+    this.cookieService.delete('Authorization', '/');
+    this.router.navigate(['login']);
+  }
 }

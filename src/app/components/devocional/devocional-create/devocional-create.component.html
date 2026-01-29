@@ -1,0 +1,45 @@
+<app-toolbar></app-toolbar>
+
+<div class="devocional-create-container">
+  <h2>Nuevo Devocional</h2>
+
+  <form [formGroup]="devocionalForm" (ngSubmit)="saveDevocional()">
+
+    <div class="form-group">
+      <label for="nombreDevocional">Título *</label>
+      <input
+        id="nombreDevocional"
+        type="text"
+        formControlName="nombreDevocional"
+        placeholder="Nombre del devocional">
+    </div>
+
+    <div class="form-actions">
+      <!-- Ver devocionales -->
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="irADevocionales()">
+        Ver devocionales
+      </button>
+
+      <!-- Crear canción -->
+      <button
+        type="button"
+        class="btn-outline"
+        (click)="irACrearCancion()">
+        Crear canción
+      </button>
+
+      <!-- Guardar -->
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="devocionalForm.invalid">
+        Guardar devocional
+      </button>
+      
+    </div>
+
+  </form>
+</div>

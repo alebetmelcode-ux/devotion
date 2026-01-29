@@ -1,0 +1,26 @@
+.select-song {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.lista {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.lista li {
+  padding: 6px 0;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+}

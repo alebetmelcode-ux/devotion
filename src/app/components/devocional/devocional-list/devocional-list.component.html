@@ -1,0 +1,46 @@
+<app-toolbar></app-toolbar>
+
+<div class="devocional-list-container">
+
+  <div class="header mx-3">
+    <h2>Devocionales</h2>
+
+    <button class="btn-primary" (click)="crearNuevo()">
+      Nuevo devocional
+    </button>
+     
+    <p-autoComplete
+      [suggestions]="filteredDevocionales"
+      (completeMethod)="filterDevocionales($event)"
+      (onSelect)="onDevocionalSelected($event)"
+      optionLabel="nombreDevocional"
+      placeholder="Buscar por nombre"
+      [dropdown]="true">
+    </p-autoComplete>
+  </div>
+
+  <!-- FILTRO -->
+  <div class="form-group">
+   
+  </div>
+
+
+
+  <div *ngIf="!cargando && devocionales.length === 0">
+    <p>No hay devocionales creados.</p>
+  </div>
+
+  <ul *ngIf="!cargando && devocionales.length > 0">
+  <li *ngFor="let d of devocionales" class="devocional-item">
+    <strong>{{ d.nombreDevocional }}</strong>
+
+    <button
+      class="btn-outline"
+      (click)="verDetalle(d.id)">
+      Ver
+    </button>
+  </li>
+</ul>
+
+
+</div>

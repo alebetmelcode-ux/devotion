@@ -1,0 +1,37 @@
+<app-toolbar></app-toolbar>
+
+<div *ngIf="cargando" class="loading">
+  Cargando canciones...
+</div>
+
+<div *ngIf="!cargando" class="select-song">
+
+  <h2>Agregar canciones</h2>
+
+  <ul class="lista">
+    <li *ngFor="let c of canciones">
+      <label>
+        <input
+          type="checkbox"
+          [(ngModel)]="c.seleccionada" />
+        {{ c.tituloCancion }}
+      </label>
+    </li>
+  </ul>
+
+  <div class="acciones">
+    <button
+      class="btn-secondary"
+      [routerLink]="['/devocionales', devocionalId]">
+      Cancelar
+    </button>
+
+    <button
+      class="btn-primary"
+      (click)="guardar()"
+      [disabled]="guardando">
+      Agregar
+    </button>
+  </div>
+
+</div>

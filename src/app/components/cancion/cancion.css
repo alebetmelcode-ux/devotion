@@ -1,26 +1,12 @@
-:host {
-  display: block;
-  width: 100%;
-}
-
-/* ================= CONTENEDOR ================= */
 .song-editor {
-  max-width: 800px;
-  margin: 0 auto;
-  background: white;
+  max-width: 900px;
+  margin: auto;
   padding: 24px;
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-h2 {
-  margin-top: 0;
-  margin-bottom: 24px;
-  color: #1F4788;
-  text-align: center;
-}
-
-/* ================= FORM ================= */
+/* GRID BASE: 50 / 50 */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -36,204 +22,233 @@ h2 {
   grid-column: span 2;
 }
 
-label {
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
+/* CELDA DE CONTROLES */
+.controls-cell {
+  align-items: flex-start;
 }
 
-input,
-select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-family: inherit;
-  box-sizing: border-box;
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: #1F4788;
-  box-shadow: 0 0 0 3px rgba(31, 71, 136, 0.2);
-}
-
-/* ================= TONO ================= */
+/* TONO */
 .key-selector-inline {
   display: flex;
   align-items: center;
-  gap: 10px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  padding: 5px;
-  width: fit-content;
+  gap: 6px;
 }
 
 .current-key {
-  font-size: 1.1em;
   font-weight: bold;
   color: #1F4788;
-  min-width: 30px;
+  min-width: 32px;
   text-align: center;
 }
 
-.transpose-btn {
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
+/* MODO */
+.mode-toggle-inline {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
 }
 
-.transpose-btn:hover {
-  background: #e0e0e0;
+/* EXPORTAR */
+.export-buttons-inline {
+  display: flex;
+  gap: 4px; /* Menos espacio para botones de solo icono */
+  margin-left: auto; /* Empuja los botones de exportación a la derecha */
 }
 
-/* ================= BOTONES ================= */
+/* VISTA PREVIA */
+.song-view {
+  font-family: 'Courier New', Consolas, monospace;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  overflow-x: auto;
+}
+
+.song-view .chords,
+.song-view .lyrics {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ENCABEZADO DE CANCIÓN */
+.song-header {
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1F4788;
+}
+
+.song-header h1 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  color: #1F4788;
+  font-weight: 700;
+}
+
+.song-meta {
+  font-size: 13px;
+  color: #666;
+  font-weight: 600;
+}
+
+/* SECCIONES */
+section {
+  margin-bottom: 12px;
+}
+
+section h3 {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* LÍNEAS DE MÚSICA */
+.music-line {
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.chords {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: pre;
+  margin-bottom: 0;
+}
+
+.lyrics {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: pre;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+/* Anula el margen para las letras que están dentro de una línea de música */
+.music-line .lyrics {
+  margin-bottom: 0;
+}
+
+.song-view .chords .chord {
+  color: #1F4788;
+  font-weight: 700;
+}
+
+/* Estilos personalizados de botones para que coincidan con el color de los acordes #1F4788 */
+.p-button.p-button-text {
+  color: #1F4788 !important;
+}
+
+.p-button.p-button-text:hover {
+  background-color: rgba(31, 71, 136, 0.05) !important; /* Tinte claro al pasar el ratón */
+}
+
+/* Botón primario por defecto (Guardar Canción) */
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary) {
+  background: #1F4788 !important;
+  border-color: #1F4788 !important;
+  color: #ffffff !important;
+}
+
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):hover {
+  background: #183a6a !important; /* Ligeramente más oscuro al pasar el ratón */
+  border-color: #183a6a !important;
+}
+
+/* Botones con contorno (Editar/Ver cuando no están seleccionados) */
+.p-button.p-button-outlined {
+  color: #1F4788 !important;
+  border-color: #1F4788 !important;
+  background-color: transparent !important;
+}
+
+.p-button.p-button-outlined:hover {
+  background-color: rgba(31, 71, 136, 0.05) !important;
+}
+
+/* Botón secundario (Cancelar) */
+.p-button.p-button-secondary {
+  background: #6c757d !important; /* Gris para el botón secundario (Cancelar) */
+  border-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-secondary:hover {
+  background: #5c636a !important; /* Ligeramente más oscuro en hover */
+  border-color: #5c636a !important;
+}
+
+/* LÍNEA VACÍA */
+.empty-line {
+  height: 8px;
+}
+
+/* ACCIONES */
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  grid-column: span 2;
 }
 
-.btn-primary,
-.btn-secondary,
-.btn-contrast {
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  border: none;
-}
-
-.btn-primary {
-  background: #1F4788;
-  color: white;
-}
-
-.btn-secondary {
-  background: #E5E7EB;
-  color: #374151;
-  border: 1px solid #D1D5DB;
-}
-
-.btn-contrast {
-  background: #000;
-  color: white;
-}
-
-/* ================= EDITOR DE LETRA ================= */
-.lyrics-editor-wrapper {
-  position: relative;
-  font-family: 'Courier New', monospace;
-  font-size: 1rem;
-  line-height: 1.6;
-  height: 400px;              /* 🔥 AQUÍ está la clave */
-  overflow: hidden;
-}
-
-.lyrics-backdrop,
-textarea {
-  width: 100%;
-  height: 100%;
-  padding: 12px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  box-sizing: border-box;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.lyrics-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  background: #f9f9f9;
-  overflow-y: auto;
-}
-
-textarea {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  background: transparent;
-  color: transparent;
-  caret-color: #111;
-  resize: none;
-  overflow-y: auto;
-}
-
-/* ================= ACORDES ================= */
-:host ::ng-deep .chord-highlight {
-  color: #1F4788;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.chord-highlight:hover {
-  background: #cee0f4;
-}
-
-.chord-highlight.selected-chord {
-  background: #1F4788;
-  color: white;
-}
-
-/* ================= EXPORT ================= */
-.export-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-/* ================= MODO PRESENTACIÓN ================= */
-.lyrics-editor-wrapper.presentation {
-  height: 80vh;
-  background: black;
-  padding: 30px;
-  border-radius: 12px;
-}
-
-.lyrics-presentation {
-  color: white;
-  font-size: 1.7rem;
-  line-height: 1.8;
-  font-family: 'Courier New', monospace;
-  white-space: pre-wrap;
-  height: 100%;
-  overflow-y: auto;
-}
-
-:host ::ng-deep .presentation .chord-highlight {
-  color: #4FC3F7;
-  font-size: 1.8rem;
-}
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 640px) {
+/* === DISEÑO RESPONSIVO === */
+@media (max-width: 768px) {
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Cambia a una sola columna en pantallas pequeñas */
+    gap: 16px; /* Reduce el espacio entre elementos */
   }
 
-  .span-2,
-  .form-actions {
+  /* Los elementos que ocupaban 2 columnas ahora ocuparán 1 automáticamente */
+  .span-2 {
     grid-column: span 1;
   }
 
-  .lyrics-editor-wrapper {
-    height: 300px;
+  .controls-row {
+    width: 100%;
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+    justify-content: flex-start; /* Alinea los elementos al inicio */
+    gap: 10px; /* Reduce el espacio entre elementos envueltos */
+  }
+
+  .export-buttons-inline {
+    margin-left: 0; /* Elimina el margen automático en móviles para que se alinee a la izquierda */
+    width: 100%; /* Permite que los botones ocupen el ancho completo */
+    justify-content: space-around; /* Distribuye los botones horizontalmente */
+  }
+
+  .mode-toggle-inline,
+  .export-buttons-inline {
+    margin-top: 10px; /* Añade un margen superior cuando los elementos se envuelvan */
+  }
+
+  .form-actions {
+    flex-direction: column; /* Apila los botones de acción verticalmente */
+    gap: 10px;
+  }
+
+  .form-actions .p-button {
+    width: 100%; /* Hace que los botones de acción ocupen todo el ancho */
+  }
+
+  .form-group .p-inputtext,
+  .form-group .p-inputtextarea,
+  .form-group p-select,
+  .form-group p-autoComplete {
+    width: 100%;
+  }
+
+  /* Reduce el tamaño de la fuente en la vista de canción y el área de texto en móviles */
+  .song-view,
+  .chords-textarea {
+    font-size: 12px;
   }
 }

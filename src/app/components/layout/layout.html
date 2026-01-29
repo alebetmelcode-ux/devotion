@@ -1,25 +1,30 @@
 <div class="layout-wrapper">
-  <!-- Toolbar / Menubar -->
+
+  <!-- Toolbar -->
   <p-drawer styleClass="layout-toolbar">
     <ng-template pTemplate="start">
-      <button 
-        pButton 
-        icon="pi pi-bars" 
+      <button
+        pButton
+        icon="pi pi-bars"
         class="p-button-text p-button-plain menu-toggle-btn"
         (click)="toggleSidebar()">
       </button>
-      <span class="app-title">Doctor App</span>
+
+      <span class="app-title">Devotion</span>
     </ng-template>
-    
+
     <ng-template pTemplate="end">
       <div class="user-section">
-        <label class="username-label">{{username}}</label>
-        <button 
-          pButton 
-          icon="pi pi-sign-out" 
+        <label class="username-label">
+          {{ username || 'Usuario' }}
+        </label>
+
+        <button
+          pButton
+          icon="pi pi-sign-out"
           class="p-button-text p-button-plain logout-btn"
           (click)="cerrarSesion()"
-          pTooltip="Cerrar Sesión"
+          pTooltip="Cerrar sesión"
           tooltipPosition="bottom">
         </button>
       </div>
@@ -28,14 +33,22 @@
 
   <!-- Layout Container -->
   <div class="layout-container">
+
     <!-- Sidebar -->
-    <p-drawer 
-      [(visible)]="sidebarVisible" 
+    <p-drawer
+      [(visible)]="sidebarVisible"
       [modal]="false"
       [showCloseIcon]="false"
       styleClass="layout-sidebar"
       [baseZIndex]="1">
-    
+
+      <!-- Aquí puedes agregar el menú lateral -->
+      <!-- Ejemplo:
+      <ul class="menu">
+        <li routerLink="/devocionales">Devocionales</li>
+      </ul>
+      -->
+
     </p-drawer>
 
     <!-- Main Content -->
@@ -44,5 +57,6 @@
         <router-outlet></router-outlet>
       </div>
     </div>
+
   </div>
 </div>

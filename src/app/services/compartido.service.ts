@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Sesion } from '../../interfaces/sesion';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
@@ -8,73 +9,66 @@ import { Sesion } from '../../interfaces/sesion';
 export class CompartidoService {
   constructor(private messageService: MessageService) {}
 
-  // Servivio de mensaje notificacion (mensaje/tipo)
   mostrarAlerta(
     mensaje: string,
     tipo: 'success' | 'error' | 'info' | 'warn' = 'error'
   ) {
     this.messageService.add({
-      severity: tipo, // Tipo de mensaje (success para el chulito)
+      severity: tipo,
       summary: tipo,
       detail: mensaje,
-      life: 1200, // Tiempo de vida en milisegundos (3 segundos)
-      key: "superior"
+      life: 1200,
+      key: 'superior',
     });
-  } //mejor y mucho mas facil , me ahorro un crud complero de permisos
+  }
 
   mostrarAlerta2(
     mensaje: string,
     tipo: 'success' | 'error' | 'info' | 'warn' = 'error'
   ) {
     this.messageService.add({
-      severity: tipo, // Tipo de mensaje (success para el chulito)
+      severity: tipo,
       summary: tipo,
       detail: mensaje,
-      life: 2500, // Tiempo de vida en milisegundos (3 segundos)
-       key: "central"
+      life: 2500,
+      key: 'central',
     });
-  } //mejor y mucho mas facil , me ahorro un crud complero de permisos
+  }
 
-  // Guarda la sesion del usuario en local storage(validar mejor opcion)
+  // ===== SESIÓN =====
+
   guardarSesion(sesion: Sesion) {
     localStorage.setItem('SessionUsuario', JSON.stringify(sesion));
+    localStorage.setItem('token', sesion.token); // 👈 CLAVE para el interceptor
   }
 
-  // Obtener el objeto session de local storage
-  obtenerSesion() {
+  obtenerSesion(): Sesion | null {
     const sesionString = localStorage.getItem('SessionUsuario');
-    const usuarioSesion = JSON.parse(sesionString!);
-    return usuarioSesion;
+    return sesionString ? JSON.parse(sesionString) : null;
   }
 
-  // eliminar el objeto session de local storage
   eliminarSesion() {
     localStorage.removeItem('SessionUsuario');
+    localStorage.removeItem('token');
   }
 
-  // Obtener el nombre del  objeto session de local storage
+  // ===== DATOS DEL USUARIO =====
+
   obtenerNombreUsuario(): string | null {
     const usuarioSesion = this.obtenerSesion();
-    return usuarioSesion?.nombreCompleto || null; // Retorna el nombre o null si no existe
+    return usuarioSesion?.username || null;
   }
 
-  // Obtener la cedula  del objeto session de local storage
-  obtenerCedulaUsuario(): string | null {
-    const cedulaSession = this.obtenerSesion();
-    return cedulaSession?.cedula || null; // Retorna el nombre o null si no existe
-  }
+  // ===== PERMISOS =====
 
   obtenerPermisosDesdeToken(): string[] {
-    const usuario = this.obtenerSesion(); // Tu método que lee del localStorage
-    if (!usuario?.token) return [];
+    const token = localStorage.getItem('token');
+    if (!token) return [];
 
     try {
-      const decoded: any = jwtDecode(usuario.token);
-      const claimKey = 'Permiso';
+      const decoded: any = jwtDecode(token);
+      const permisos = decoded['Permiso'];
 
-      const permisos = decoded[claimKey];
-
-      // Si solo hay un permiso, puede venir como string, no como array
       if (typeof permisos === 'string') return [permisos];
       return Array.isArray(permisos) ? permisos : [];
     } catch (error) {
@@ -83,13 +77,8 @@ export class CompartidoService {
     }
   }
 
-  // servicioSesion o servicioPermisos
   tienePermiso(nombrePermiso: string): boolean {
     const permisos = this.obtenerPermisosDesdeToken();
     return permisos.includes(nombrePermiso);
   }
 }
-function jwtDecode(token: any): any {
-  throw new Error('Function not implemented.');
-}
-
