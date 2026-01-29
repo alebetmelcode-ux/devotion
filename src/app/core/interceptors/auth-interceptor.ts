@@ -2,12 +2,20 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
-  // Excluir login (y otros públicos si aplica)
-  if (req.url.includes('/Usuario/login')) {
+  // Excluir endpoints públicos
+  if (
+    req.url.includes('/Usuario/login') ||
+    req.url.includes('/Usuario/registro')
+  ) {
     return next(req);
   }
 
-  const token = localStorage.getItem('token');
+  const sesion = localStorage.getItem('sesion');
+  if (!sesion) {
+    return next(req);
+  }
+
+  const { token } = JSON.parse(sesion);
 
   if (!token) {
     return next(req);

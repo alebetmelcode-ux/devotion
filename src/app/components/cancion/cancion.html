@@ -2,12 +2,11 @@
 
 <div class="song-editor">
 
+  <h1>Editar canción</h1>
 
-  <h1>Editar cancion</h1>
   <form [formGroup]="songForm" (ngSubmit)="saveSong()" class="form-grid">
 
-    <!-- FILA INICIAL -->
-    <!-- TÍTULO (50%) -->
+    <!-- TÍTULO -->
     <div class="form-group">
       <label>Título *</label>
       <input
@@ -17,9 +16,9 @@
         placeholder="Título de la canción">
     </div>
 
-    <!-- CONTROLES (ESPACIO RESTANTE) -->
+    <!-- CONTROLES -->
     <div class="form-group controls-cell">
-       <label>Subir/bajar Nota*</label>
+      <label>Subir/bajar Nota *</label>
 
       <div class="controls-row">
 
@@ -28,9 +27,9 @@
           <button
             pButton
             type="button"
-            icon="pi pi-chevron-down"
             class="p-button-text"
             (click)="transposeDown()">
+            <i class="fa-solid fa-chevron-down"></i>
           </button>
 
           <span class="current-key">
@@ -40,9 +39,9 @@
           <button
             pButton
             type="button"
-            icon="pi pi-chevron-up"
             class="p-button-text"
             (click)="transposeUp()">
+            <i class="fa-solid fa-chevron-up"></i>
           </button>
         </div>
 
@@ -67,20 +66,43 @@
           </button>
         </div>
 
-        <!-- Export Buttons -->
+        <!-- EXPORTAR -->
         <div class="export-buttons-inline">
-          <button pButton type="button" icon="pi pi-file-pdf" class="p-button-text" (click)="exportAs('pdf')" pTooltip="Exportar a PDF" tooltipPosition="bottom"></button>
-          <button pButton type="button" icon="pi pi-image" class="p-button-text" (click)="exportAs('jpg')" pTooltip="Exportar a JPG"tooltipPosition="bottom"></button>
-          <button pButton type="button" icon="pi pi-file-export" class="p-button-text" (click)="exportAs('ppt')" pTooltip="Exportar a PowerPoint"tooltipPosition="bottom"></button>
-          
-          <!-- New Import PDF Button -->
-        
+          <button
+            pButton
+            type="button"
+            class="p-button-text"
+            (click)="exportAs('pdf')"
+            pTooltip="Exportar a PDF"
+            tooltipPosition="bottom">
+            <i class="fa-solid fa-file-pdf"></i>
+          </button>
+
+          <button
+            pButton
+            type="button"
+            class="p-button-text"
+            (click)="exportAs('jpg')"
+            pTooltip="Exportar a JPG"
+            tooltipPosition="bottom">
+            <i class="fa-solid fa-image"></i>
+          </button>
+
+          <button
+            pButton
+            type="button"
+            class="p-button-text"
+            (click)="exportAs('ppt')"
+            pTooltip="Exportar a PowerPoint"
+            tooltipPosition="bottom">
+            <i class="fa-solid fa-file-powerpoint"></i>
+          </button>
         </div>
 
       </div>
     </div>
 
-    <!-- CATEGORÍA (50%) -->
+    <!-- CATEGORÍA -->
     <div class="form-group">
       <label>Categoría *</label>
       <p-select
@@ -91,7 +113,7 @@
       </p-select>
     </div>
 
-    <!-- BUSCAR CANCIÓN (50%) -->
+    <!-- BUSCAR -->
     <div class="form-group">
       <label>Buscar canción existente</label>
       <p-autoComplete
@@ -100,7 +122,6 @@
         (onSelect)="onSongSelected($event)"
         optionLabel="tituloCancion"
         placeholder="Buscar por título o letra"
-        
         [dropdown]="true">
       </p-autoComplete>
     </div>
@@ -142,12 +163,12 @@
 
       <button
         *ngIf="songForm.get('id')?.value"
-                pButton
-                type="button"
-                label="Eliminar Canción"
-                class="p-button-danger"
-                (click)="deleteSong()">
-              </button>
+        pButton
+        type="button"
+        label="Eliminar Canción"
+        class="p-button-danger"
+        (click)="deleteSong()">
+      </button>
     </div>
 
   </form>

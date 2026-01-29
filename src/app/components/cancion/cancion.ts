@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 /* PrimeNG */
 import { InputTextModule } from 'primeng/inputtext';
@@ -60,6 +61,7 @@ export class Cancion implements OnInit {
   private transposeService = inject(TransposeService);
   private categoriaService = inject(CategoriaService);
   private router = inject(Router);
+  private sanitizer = inject(DomSanitizer); // ✅ AÑADIDO (no reemplaza nada)
 
   @Output() songSaved = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
@@ -70,7 +72,7 @@ export class Cancion implements OnInit {
   songs: Song[] = [];
   filteredSongs: Song[] = [];
 
-  highlightedLyrics = '';
+  highlightedLyrics!: SafeHtml; // ✅ antes string
   mode: 'edit' | 'view' = 'edit';
 
   /* ==================== INIT ==================== */
@@ -128,7 +130,7 @@ export class Cancion implements OnInit {
       id: song.id,
       tituloCancion: song.tituloCancion,
       tonoOriginal: song.tonoOriginal,
-      tonoFinal: song.tonoOriginal, // derivado, no backend
+      tonoFinal: song.tonoOriginal,
       idCategoria: song.idCategoria,
       letra: song.letra
     });
@@ -184,11 +186,14 @@ export class Cancion implements OnInit {
     }
 
     if (sectionOpen) html += `</section>`;
-    this.highlightedLyrics = html;
+
+    // ✅ ÚNICA CORRECCIÓN FUNCIONAL
+    this.highlightedLyrics =
+      this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
   private isSectionHeader(line: string): boolean {
-    return /^(coro|estrofa|verso|verse|chorus|bridge|intro|outro|pre-coro|pre-chorus)(\s+\d+|\s+[IVX]+)?$/i.test(line);
+    return /^(\/\/\s*)?(intro|estrofa|coro|verso|puente|bridge|outro)(\s+\d+|\s+[IVX]+)?$/i.test(line);
   }
 
   private cleanSectionHeader(line: string): string {
@@ -200,7 +205,7 @@ export class Cancion implements OnInit {
   }
 
   private parseInlineChords(raw: string): { chordLine: string; lyricLine: string } {
-    const lyricLine = this.escapeHtml(raw.replace(/\[[^\]]+\]/g, ''));
+    const lyricLine =  raw.replace(/\[[^\]]+\]/g, '');
 
     let chordLine = '';
     let i = 0;

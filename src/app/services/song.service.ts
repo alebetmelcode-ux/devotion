@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Song } from '../models/song.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class SongService {
 
   songToEdit = signal<Song | undefined>(undefined);
 
-  private apiUrl = 'http://localhost:5138/api/Cancion';
+  private apiUrl = `${environment.apiUrl}Cancion`;
   private http = inject(HttpClient);
 
   /* ==================== GET ALL ==================== */
@@ -61,7 +62,6 @@ export class SongService {
 
   /* ==================== PRIVATE MAPPERS ==================== */
 
-  /** Compatible con CrearCancionDto */
   private toCreatePayload(song: Song) {
     return {
       tituloCancion: song.tituloCancion,
@@ -71,7 +71,6 @@ export class SongService {
     };
   }
 
-  /** Compatible con ActualizarCancionDto */
   private toUpdatePayload(song: Song) {
     return {
       id: song.id,

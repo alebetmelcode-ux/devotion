@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -12,11 +13,12 @@ import { ApiResponse } from '../../interfaces/ApiResponse';
 })
 export class UsuarioService {
 
+  // ⚠️ Coincide EXACTAMENTE con Swagger: /api/Usuario
   private readonly baseUrl = `${environment.apiUrl}Usuario/`;
 
   constructor(private http: HttpClient) {}
 
-  // 🔐 LOGIN → el backend devuelve Sesion DIRECTAMENTE
+  // 🔐 LOGIN → POST /api/Usuario/login
   iniciarSesion(request: Login): Observable<Sesion> {
     return this.http.post<Sesion>(
       `${this.baseUrl}login`,
@@ -24,18 +26,18 @@ export class UsuarioService {
     );
   }
 
-  // 📝 REGISTRO → aquí sí puedes usar ApiResponse si el backend lo hace
-  registrar(request: Registro): Observable<ApiResponse<Sesion>> {
-    return this.http.post<ApiResponse<Sesion>>(
+  // 📝 REGISTRO → POST /api/Usuario/registro
+  registrar(request: Registro): Observable<Sesion> {
+    return this.http.post<Sesion>(
       `${this.baseUrl}registro`,
       request
     );
   }
 
-  lista(): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(this.baseUrl);
+  // 📋 LISTAR USUARIOS → GET /api/Usuario (requiere token)
+  lista(): Observable<any> {
+    return this.http.get<any>(this.baseUrl);
   }
-
   listadoRoles(): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(
       `${this.baseUrl}listadoRoles`

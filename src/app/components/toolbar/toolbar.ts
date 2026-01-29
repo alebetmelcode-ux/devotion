@@ -25,19 +25,16 @@ export class ToolbarComponent {
     this.items = [
       {
         label: 'Canciones',
-       icon: 'pi pi-folder-open',
         command: () => this.router.navigate(['/cancion'])
       },
       {
         label: 'Devocionales',
-        icon: 'pi pi-book',
         command: () => this.router.navigate(['/devocionales'])
       }
     ];
   }
 
-  // ✅ MÉTODO PÚBLICO PARA EL TEMPLATE
   irInicio(): void {
-    this.router.navigate(['/devocionales']);
+    this.router.navigate(['/cancion']);
   }
 }

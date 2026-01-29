@@ -71,6 +71,12 @@
   overflow-x: auto;
 }
 
+.song-view .chords,
+.song-view .lyrics {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* ENCABEZADO DE CANCIÓN */
 .song-header {
   margin-bottom: 16px;
@@ -208,7 +214,20 @@ section h3 {
 
   .controls-row {
     width: 100%;
-    justify-content: space-between; /* Distribuye los controles de tono y modo */
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+    justify-content: flex-start; /* Alinea los elementos al inicio */
+    gap: 10px; /* Reduce el espacio entre elementos envueltos */
+  }
+
+  .export-buttons-inline {
+    margin-left: 0; /* Elimina el margen automático en móviles para que se alinee a la izquierda */
+    width: 100%; /* Permite que los botones ocupen el ancho completo */
+    justify-content: space-around; /* Distribuye los botones horizontalmente */
+  }
+
+  .mode-toggle-inline,
+  .export-buttons-inline {
+    margin-top: 10px; /* Añade un margen superior cuando los elementos se envuelvan */
   }
 
   .form-actions {
@@ -218,5 +237,18 @@ section h3 {
 
   .form-actions .p-button {
     width: 100%; /* Hace que los botones de acción ocupen todo el ancho */
+  }
+
+  .form-group .p-inputtext,
+  .form-group .p-inputtextarea,
+  .form-group p-select,
+  .form-group p-autoComplete {
+    width: 100%;
+  }
+
+  /* Reduce el tamaño de la fuente en la vista de canción y el área de texto en móviles */
+  .song-view,
+  .chords-textarea {
+    font-size: 12px;
   }
 }

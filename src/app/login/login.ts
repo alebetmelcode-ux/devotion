@@ -67,7 +67,8 @@ export class LoginComponent {
     this.mostrarLoading = true;
 
     const request: Login = {
-      userName: this.formLogin.value.userName,
+     
+      username:this.formLogin.value.userName,
       password: this.formLogin.value.password
     };
 
@@ -78,7 +79,7 @@ export class LoginComponent {
         // ✅ response ES Sesion { token, username }
         this.compartidoServicio.guardarSesion(response);
 
-        this.router.navigate(['/devocionales']);
+        this.router.navigate(['/cancion']);
       },
       error: () => {
         this.compartidoServicio.mostrarAlerta(

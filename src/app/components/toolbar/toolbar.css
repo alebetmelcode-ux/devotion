@@ -8,9 +8,10 @@
 /* =========================
    LOGO
 ========================= */
-.logo-image {
+.logo-image img {
   width: 160px;
   height: 30px;
+  cursor: pointer;
 }
 
 /* =========================
@@ -21,7 +22,30 @@
 }
 
 /* =========================
-   HOVER BOTONES (TEXTO + ICONO)
+   LINK DEL ITEM (CLAVE)
+========================= */
+:host ::ng-deep .p-menubar .p-menuitem-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* =========================
+   ICONO BASE (CLAVE 🔥)
+========================= */
+:host ::ng-deep .p-menubar .menu-icon {
+  display: inline-flex !important;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+  visibility: visible !important;
+}
+
+/* =========================
+   HOVER BOTONES
 ========================= */
 :host ::ng-deep
 .p-menubar
@@ -33,18 +57,18 @@ a:hover {
   border-radius: 9px;
 }
 
-/* 🔑 ICONOS EN HOVER */
+/* ICONO EN HOVER */
 :host ::ng-deep
 .p-menubar
 .p-menubar-item
 .p-menubar-item-content
 a:hover
-.pi {
+.menu-icon {
   color: aliceblue;
 }
 
 /* =========================
-   ITEM ACTIVO (SELECCIONADO)
+   ITEM ACTIVO
 ========================= */
 :host ::ng-deep
 .p-menubar
@@ -54,18 +78,18 @@ a {
   background-color: rgba(255, 255, 255, 0.25);
 }
 
-/* 🔑 ICONOS EN ACTIVO */
+/* ICONO ACTIVO */
 :host ::ng-deep
 .p-menubar
 .p-menubar-item.p-highlight
 .p-menubar-item-content
 a
-.pi {
+.menu-icon {
   color: inherit;
 }
 
 /* =========================
-   TRANSICIONES SUAVES
+   TRANSICIONES
 ========================= */
 :host ::ng-deep
 .p-menubar
@@ -76,6 +100,6 @@ a,
 .p-menubar
 .p-menubar-item
 .p-menubar-item-content
-a .pi {
+a .menu-icon {
   transition: background-color 0.15s ease, color 0.15s ease;
 }

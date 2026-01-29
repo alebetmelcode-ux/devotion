@@ -1,15 +1,31 @@
-<p-menubar
-  [model]="items"
-  class="app-toolbar">
+<p-menubar [model]="items">
 
-  <!-- LOGO A LA IZQUIERDA -->
+  <!-- LOGO (NO SE TOCA) -->
   <ng-template pTemplate="start">
-    <div class="logo-container" (click)="irInicio()">
-      <img
-        src="assets/images/devotion21.png"
-        alt="Devotion Logo"
-        class="logo-image" />
+     <div class="logo-image" (click)="irInicio()">
+      <img src="assets/images/devotion21.png" alt="DevotionLogo">
     </div>
+  </ng-template>
+
+  <!-- ITEMS DEL MENÚ (Canciones / Devocionales) -->
+  <ng-template pTemplate="item" let-item let-root="root">
+    <a
+      *ngIf="root"
+      class="p-menuitem-link"
+      (click)="item.command?.()">
+
+      <i
+        class="menu-icon"
+        [ngClass]="{
+          'fa-solid fa-music': item.label === 'Canciones',
+          'fa-solid fa-book-bible': item.label === 'Devocionales'
+        }">
+      </i>
+
+      <span class="p-menuitem-text">
+        {{ item.label }}
+      </span>
+    </a>
   </ng-template>
 
 </p-menubar>

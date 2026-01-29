@@ -34,22 +34,23 @@ export class DevocionalCreateComponent implements OnInit {
   saveDevocional(): void {
     if (this.devocionalForm.invalid) return;
 
-    this.devocionalService.crear({
-      nombreDevocional: this.devocionalForm.value.nombreDevocional
-    } as any).subscribe({
-      next: (response) => {
-        // ✅ Navegación correcta con ID real
-        this.router.navigate(['/devocionales', response.id]);
+    const nombre = this.devocionalForm.value.nombreDevocional;
+
+    this.devocionalService.crear(nombre).subscribe({
+      next: (devocional) => {
+        // ✅ ahora sí existe el id
+        this.router.navigate(['/devocionales', devocional.id]);
+      },
+      error: (err) => {
+        console.error('Error al crear devocional', err);
       }
     });
   }
 
-  // ✅ Volver al listado (SIN :id)
   irADevocionales(): void {
     this.router.navigate(['/devocionales']);
   }
 
-  // ✅ Ir a crear canción (ruta Angular)
   irACrearCancion(): void {
     this.router.navigate(['/cancion']);
   }

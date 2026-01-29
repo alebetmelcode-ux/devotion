@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Devocional } from '../models/devocional.model';
 import { DevocionalCancionDetalle } from '../models/devocional-cancion-detalle.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DevocionalService {
 
-  private readonly apiUrl = 'http://localhost:5138/api/Devocional';
+  private readonly apiUrl = `${environment.apiUrl}Devocional`;
 
   constructor(private http: HttpClient) {}
 
@@ -55,7 +56,7 @@ export class DevocionalService {
   }
 
   // ============================
-  // POST: agregar canciones al devocional
+  // POST: agregar canciones
   // ============================
   agregarCanciones(
     devocionalId: number,
@@ -68,7 +69,7 @@ export class DevocionalService {
   }
 
   // ============================
-  // GET: obtener canciones del devocional
+  // GET: canciones del devocional
   // ============================
   obtenerCanciones(
     devocionalId: number
@@ -94,7 +95,7 @@ export class DevocionalService {
   }
 
   // ============================
-  // DELETE: eliminar canción SOLO del devocional
+  // DELETE: eliminar canción del devocional
   // ============================
   eliminarCancion(
     devocionalId: number,
